@@ -1,7 +1,7 @@
 import { and, count, eq } from "drizzle-orm";
 import { Response, Router } from "express";
-import { db } from "../../config/database";
-import { endpoints, users } from "../../db/schema";
+import { db } from "../config/database";
+import { endpoints, users } from "../db/schema";
 import {
   createEndpointSchema,
   getEndpointParamsSchema,
@@ -9,21 +9,70 @@ import {
   listEndpointsQuerySchema,
   type CreateEndpointDto,
   type ListEndpointsQueryDto,
-} from "../../dto/endpoints.dto";
+} from "../dto/endpoints.dto";
 import {
   AuthenticatedRequest,
   verifyWalletSignature,
-} from "../../middleware/auth";
+} from "../middleware/auth";
 import {
   validateBody,
   validateParams,
   validateQuery,
-} from "../../middleware/validation";
+} from "../middleware/validation";
 
 const router = Router();
 
 /**
- * POST /api/endpoints
+ * GET /endpoints
+ * List all endpoints (public, for marketplace)
+ */
+router.get(
+  "/",
+  validateQuery(listEndpointsQuerySchema),
+  async (req, res: Response) => {
+    try {
+      const { page, limit } = req.query as unknown as ListEndpointsQueryDto;
+      const offset = (page - 1) * limit;
+
+      const allEndpoints = await db
+        .select({
+          id: endpoints.id,
+          username: users.username,
+          name: endpoints.name,
+          description: endpoints.description,
+          httpMethod: endpoints.httpMethod,
+          paymentAmount: endpoints.paymentAmount,
+          tokenType: endpoints.tokenType,
+          createdAt: endpoints.createdAt,
+        })
+        .from(endpoints)
+        .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
+        .limit(limit)
+        .offset(offset)
+        .orderBy(endpoints.createdAt);
+
+      const [{ total }] = await db.select({ total: count() }).from(endpoints);
+
+      return res.json({
+        endpoints: allEndpoints,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching endpoints:", error);
+      return res.status(500).json({
+        error: "Internal server error",
+      });
+    }
+  }
+);
+
+/**
+ * POST /endpoints
  * Register a new endpoint (requires authentication)
  */
 router.post(
@@ -116,56 +165,7 @@ router.post(
 );
 
 /**
- * GET /api/endpoints
- * List all endpoints (public, for marketplace)
- */
-router.get(
-  "/",
-  validateQuery(listEndpointsQuerySchema),
-  async (req, res: Response) => {
-    try {
-      const { page, limit } = req.query as ListEndpointsQueryDto;
-      const offset = (page - 1) * limit;
-
-      const allEndpoints = await db
-        .select({
-          id: endpoints.id,
-          username: users.username,
-          name: endpoints.name,
-          description: endpoints.description,
-          httpMethod: endpoints.httpMethod,
-          paymentAmount: endpoints.paymentAmount,
-          tokenType: endpoints.tokenType,
-          createdAt: endpoints.createdAt,
-        })
-        .from(endpoints)
-        .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
-        .limit(limit)
-        .offset(offset)
-        .orderBy(endpoints.createdAt);
-
-      const [{ total }] = await db.select({ total: count() }).from(endpoints);
-
-      return res.json({
-        endpoints: allEndpoints,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching endpoints:", error);
-      return res.status(500).json({
-        error: "Internal server error",
-      });
-    }
-  }
-);
-
-/**
- * GET /api/endpoints/:id
+ * GET /endpoints/:id
  * Get specific endpoint details
  */
 router.get(
@@ -214,7 +214,7 @@ router.get(
 );
 
 /**
- * GET /api/endpoints/user/:wallet
+ * GET /endpoints/user/:wallet
  * Get all endpoints for a specific user
  */
 router.get(
