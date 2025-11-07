@@ -1,6 +1,8 @@
 import cors from "cors";
 import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
+import endpointsRouter from "./routes/api/endpoints";
+import proxyRouter from "./routes/proxy";
 
 dotenv.config();
 
@@ -21,6 +23,10 @@ app.get("/health", (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use("/api/endpoints", endpointsRouter);
+
+app.use("/", proxyRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({
@@ -45,7 +51,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);

@@ -25,22 +25,18 @@ router.all("/:username/:endpointName", async (req: Request, res: Response) => {
       .from(endpoints)
       .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
       .where(
-        and(eq(users.username, username), eq(endpoints.name, endpointName))
+        and(
+          eq(users.username, username),
+          eq(endpoints.name, endpointName),
+          eq(endpoints.httpMethod, httpMethod)
+        )
       )
       .limit(1);
 
     if (!endpoint) {
       return res.status(404).json({
         error: "Endpoint not found",
-        message: `No endpoint found for ${username}/${endpointName}`,
-      });
-    }
-
-    if (endpoint.httpMethod !== httpMethod) {
-      return res.status(405).json({
-        error: "Method not allowed",
-        message: `This endpoint only accepts ${endpoint.httpMethod} requests`,
-        requestedMethod: httpMethod,
+        message: `No endpoint found for ${username}/${endpointName} with method ${httpMethod}`,
       });
     }
 
