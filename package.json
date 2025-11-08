@@ -23,6 +23,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@faremeter/info": "^0.11.1",
+    "@faremeter/middleware": "^0.11.1",
     "@solana/web3.js": "^1.98.4",
     "axios": "^1.13.2",
     "bs58": "^6.0.0",
