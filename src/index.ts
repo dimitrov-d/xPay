@@ -2,6 +2,7 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import endpointsRouter from "./routes/endpoints";
+import mcpRouter from "./routes/mcp";
 import proxyRouter from "./routes/proxy";
 
 dotenv.config();
@@ -25,6 +26,8 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 app.use("/endpoints", endpointsRouter);
+
+app.use("/mcp", mcpRouter);
 
 app.use("/", proxyRouter);
 
