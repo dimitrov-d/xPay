@@ -1,5 +1,14 @@
-import { Request, Response, NextFunction } from "express";
-import { ZodSchema, ZodError } from "zod";
+import { NextFunction, Request, Response } from "express";
+import { ZodError, ZodSchema } from "zod";
+
+declare global {
+  namespace Express {
+    interface Request {
+      validatedQuery?: any;
+      validatedParams?: any;
+    }
+  }
+}
 
 export function validateBody(schema: ZodSchema) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -24,7 +33,8 @@ export function validateBody(schema: ZodSchema) {
 export function validateQuery(schema: ZodSchema) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      req.query = schema.parse(req.query) as any;
+      const validated = schema.parse(req.query);
+      req.validatedQuery = validated;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -44,7 +54,8 @@ export function validateQuery(schema: ZodSchema) {
 export function validateParams(schema: ZodSchema) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      req.params = schema.parse(req.params) as any;
+      const validated = schema.parse(req.params);
+      req.validatedParams = validated;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -60,4 +71,3 @@ export function validateParams(schema: ZodSchema) {
     }
   };
 }
-

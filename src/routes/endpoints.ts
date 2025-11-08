@@ -31,7 +31,7 @@ router.get(
   validateQuery(listEndpointsQuerySchema),
   async (req, res: Response) => {
     try {
-      const { page, limit } = req.query as unknown as ListEndpointsQueryDto;
+      const { page, limit } = req.validatedQuery as ListEndpointsQueryDto;
       const offset = (page - 1) * limit;
 
       const allEndpoints = await db
@@ -173,7 +173,7 @@ router.get(
   validateParams(getEndpointParamsSchema),
   async (req, res: Response) => {
     try {
-      const { id } = req.params;
+      const { id } = req.validatedParams;
 
       const [endpoint] = await db
         .select({
@@ -222,7 +222,7 @@ router.get(
   validateParams(getUserEndpointsParamsSchema),
   async (req, res: Response) => {
     try {
-      const { wallet } = req.params;
+      const { wallet } = req.validatedParams;
 
       const userEndpoints = await db
         .select()
