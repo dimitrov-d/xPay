@@ -23,7 +23,7 @@ async function main() {
   const network = "mainnet-beta";
   const connection = new Connection(clusterApiUrl(network));
   // Lookup USDC mint address
-  const usdcMint = new PublicKey(lookupKnownSPLToken(network, "USDC").address);
+  const usdcMint = new PublicKey(lookupKnownSPLToken(network, "USDC")!.address);
 
   // Create wallet interface
   const wallet = {
