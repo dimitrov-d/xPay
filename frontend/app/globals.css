@@ -97,3 +97,29 @@ All colors MUST be HSL.
   }
 }
 
+/* Ensure Coinbase CDP modal appears above all content */
+/* Radix UI Dialog Portal - ensure it's above everything */
+[data-radix-portal] {
+  z-index: 9999 !important;
+}
+
+/* Radix UI Dialog Overlay - backdrop with blur */
+[data-radix-portal] > div[data-radix-dialog-overlay] {
+  z-index: 9999 !important;
+  position: fixed !important;
+  inset: 0 !important;
+}
+
+/* Coinbase modal overlay - ensure proper z-index and backdrop */
+div[class*="Modal-module__overlay"] {
+  z-index: 9999 !important;
+  position: fixed !important;
+  inset: 0 !important;
+}
+
+/* Coinbase modal content - ensure it's above the overlay */
+div[class*="Modal-module__modal"] {
+  z-index: 10000 !important;
+  position: relative !important;
+}
+

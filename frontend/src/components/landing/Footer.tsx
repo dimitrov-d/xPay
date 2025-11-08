@@ -6,7 +6,6 @@ export const Footer = () => {
     <footer className="border-t border-border bg-card py-12 px-4">
       <div className="container mx-auto max-w-6xl">
         <div className="flex flex-col md:flex-row items-start md:items-start justify-center gap-1 md:gap-12 mb-8">
-          {/* Brand - Left side */}
           <div className="flex flex-col gap-3 max-w-md w-full md:w-2/5 md:items-end">
             <div className="flex items-center gap-2 shrink-0 mb-2">
               <Image src="/logo.png" alt="xPay" width={32} height={32} className="w-8 h-8" />
@@ -17,7 +16,6 @@ export const Footer = () => {
             </p>
           </div>
 
-          {/* Product - Make column and higher */}
           <div className="flex flex-col gap-2 shrink-0 mt-4 md:mt-0 min-h-40 md:w-2/5">
             <h3 className="font-semibold mb-0 text-sm">Product</h3>
             <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
@@ -45,7 +43,6 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-border gap-4">
           <p className="text-sm text-muted-foreground">
             © 2025 xPay. Built for the Solana x402 Protocol Hackathon.

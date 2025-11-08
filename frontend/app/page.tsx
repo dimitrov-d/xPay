@@ -1,11 +1,11 @@
+import { CTA } from "@/components/landing/CTA";
+import { Features } from "@/components/landing/Features";
+import { Footer } from "@/components/landing/Footer";
 import { Header } from "@/components/landing/Header";
 import { Hero } from "@/components/landing/Hero";
-import { Features } from "@/components/landing/Features";
 import { HowItWorks } from "@/components/landing/HowItWorks";
-import { WhyX402 } from "@/components/landing/WhyX402";
 import { Marketplace } from "@/components/landing/Marketplace";
-import { CTA } from "@/components/landing/CTA";
-import { Footer } from "@/components/landing/Footer";
+import { WhyX402 } from "@/components/landing/WhyX402";
 
 export default function Home() {
   return (

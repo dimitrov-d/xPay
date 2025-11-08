@@ -32,7 +32,6 @@ export const HowItWorks = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 relative">
-          {/* Connection lines for desktop */}
           <div className="hidden md:block absolute top-1/4 left-0 w-full h-0.5 bg-border -z-10" />
 
           {steps.map((step, index) => (
