@@ -8,6 +8,13 @@
       "when": 1762521718472,
       "tag": "0000_last_luminals",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762599057538,
+      "tag": "0001_magenta_firebrand",
+      "breakpoints": true
     }
   ]
 }

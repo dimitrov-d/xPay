@@ -11,7 +11,7 @@ import { endpoints, users } from "../db/schema";
 async function createPaywallMiddleware(
   paymentAmount: string,
   asset: string,
-  receiverAddress: string,
+  userWallet: string,
   resource: string,
   description: string
 ) {
@@ -34,7 +34,7 @@ async function createPaywallMiddleware(
         network: "mainnet-beta",
         asset: asset as any,
         amount: `${+paymentAmount * 10 ** 6}`,
-        payTo: receiverAddress,
+        payTo: userWallet,
       })
       .map((req) => ({
         ...req,
@@ -59,7 +59,7 @@ export function createPaywallMiddlewareFactory() {
           id: endpoints.id,
           paymentAmount: endpoints.paymentAmount,
           tokenType: endpoints.tokenType,
-          receiverAddress: endpoints.receiverAddress,
+          userWallet: endpoints.userWallet,
           description: endpoints.description,
         })
         .from(endpoints)
@@ -85,7 +85,7 @@ export function createPaywallMiddlewareFactory() {
       const paywallMiddleware = await createPaywallMiddleware(
         endpoint.paymentAmount,
         endpoint.tokenType,
-        endpoint.receiverAddress,
+        endpoint.userWallet,
         resource,
         endpoint.description
       );

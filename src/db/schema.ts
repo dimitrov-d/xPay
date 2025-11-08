@@ -18,7 +18,6 @@ export const endpoints = pgTable("endpoints", {
   httpMethod: text("http_method").notNull(),
   paymentAmount: numeric("payment_amount").notNull(),
   tokenType: text("token_type").notNull(),
-  receiverAddress: text("receiver_address").notNull(),
   customAuthHeaders: jsonb("custom_auth_headers"),
   sampleBody: jsonb("sample_body"),
   sampleResponse: jsonb("sample_response"),

@@ -47,11 +47,7 @@ export const createEndpointSchema = z.object({
     .number()
     .nonnegative("Payment amount must be a non-negative number"),
   tokenType: z.string().min(1, "Token type is required"),
-  receiverAddress: z.string().min(1, "Receiver address is required"),
-  customAuthHeaders: z
-    .record(z.string(), z.string())
-    .optional()
-    .nullable(),
+  customAuthHeaders: z.record(z.string(), z.string()).optional().nullable(),
   sampleBody: z.any().optional().nullable(),
   sampleResponse: z.any().optional().nullable(),
 });
@@ -83,4 +79,3 @@ export type GetEndpointParamsDto = z.infer<typeof getEndpointParamsSchema>;
 export type GetUserEndpointsParamsDto = z.infer<
   typeof getUserEndpointsParamsSchema
 >;
-
