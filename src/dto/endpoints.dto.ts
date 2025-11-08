@@ -1,3 +1,4 @@
+import { PublicKey } from "@solana/web3.js";
 import { z } from "zod";
 
 const HTTP_METHODS = [
@@ -46,7 +47,22 @@ export const createEndpointSchema = z.object({
   paymentAmount: z
     .number()
     .nonnegative("Payment amount must be a non-negative number"),
-  tokenType: z.string().min(1, "Token type is required"),
+  tokenType: z
+    .string()
+    .min(1, "Token type is required")
+    .refine(
+      (val) => {
+        try {
+          new PublicKey(val);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: "Token type must be a valid SPL token address",
+      }
+    ),
   customAuthHeaders: z.record(z.string(), z.string()).optional().nullable(),
   sampleBody: z.any().optional().nullable(),
   sampleResponse: z.any().optional().nullable(),

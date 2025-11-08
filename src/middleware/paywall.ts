@@ -7,6 +7,11 @@ import { endpoints, users } from "../db/schema";
 
 /**
  * Creates a FareMeter middleware for a specific endpoint configuration
+ * @param paymentAmount - Payment amount as a string
+ * @param asset - SPL token address (Solana public key)
+ * @param userWallet - User wallet address to receive payments
+ * @param resource - Resource URL for the payment
+ * @param description - Description of the payment
  */
 async function createPaywallMiddleware(
   paymentAmount: string,
