@@ -1,12 +1,22 @@
 {
-  "name": "xpay-landing",
+  "name": "xpay-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "No-code API monetization platform powered by x402",
+  "keywords": [
+    "x402",
+    "solana",
+    "api",
+    "monetization",
+    "proxy"
+  ],
+  "license": "ISC",
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf .next node_modules"
   },
   "dependencies": {
     "@coinbase/cdp-core": "^0.0.58",

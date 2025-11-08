@@ -49,3 +49,6 @@ Thumbs.db
 .next
 
 payer-wallet.json
+
+# Turborepo
+.turbo
