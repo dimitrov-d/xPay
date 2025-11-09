@@ -14,7 +14,6 @@ const router = Router();
  */
 router.get("/", async (req: Request, res: Response) => {
   try {
-    // Get all users with their endpoint counts
     const mcpServers = await db
       .select({
         username: users.username,
@@ -25,9 +24,8 @@ router.get("/", async (req: Request, res: Response) => {
       .from(users)
       .leftJoin(endpoints, eq(users.walletAddress, endpoints.userWallet))
       .groupBy(users.username, users.walletAddress, users.createdAt)
-      .having(sql`count(${endpoints.id}) > 0`); // Only show users with endpoints
+      .having(sql`count(${endpoints.id}) > 0`);
 
-    // Build the response with MCP server URLs
     const protocol = req.protocol;
     const host = req.get("host");
 
@@ -66,7 +64,6 @@ router.post(
     try {
       const { username } = req.params;
 
-      // Verify user exists
       const [user] = await db
         .select({ username: users.username })
         .from(users)
@@ -80,12 +77,10 @@ router.post(
         });
       }
 
-      // Handle the MCP request
       await handleMcpRequest(req, res, username);
     } catch (error: any) {
       console.error("Error in MCP route:", error);
 
-      // Only send response if headers haven't been sent
       if (!res.headersSent) {
         return res.status(500).json({
           error: "Internal server error",
@@ -104,7 +99,6 @@ router.get("/:username", async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
 
-    // Verify user exists
     const [user] = await db
       .select({ username: users.username })
       .from(users)
@@ -139,7 +133,6 @@ router.delete("/:username", async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
 
-    // Verify user exists
     const [user] = await db
       .select({ username: users.username })
       .from(users)

@@ -8,7 +8,6 @@ import { endpoints, users } from "../db/schema";
 import { generateToolInputSchema } from "../utils/schema";
 import { forwardRequest } from "./proxy";
 
-// Store active MCP sessions
 const sessions = new Map<
   string,
   {
@@ -62,7 +61,6 @@ async function createMcpServerForUser(
     .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
     .where(eq(users.username, username));
 
-  // Register each endpoint as an MCP tool
   for (const endpoint of userEndpoints) {
     const toolName = `${endpoint.name}`;
     const inputSchema = generateToolInputSchema(
@@ -135,12 +133,10 @@ export async function handleMcpRequest(
   const sessionId = req.headers["mcp-session-id"] as string | undefined;
   let session = sessionId ? sessions.get(sessionId) : undefined;
 
-  // Create new session on initialize
   if (!session && req.body?.method === "initialize") {
     try {
       const { server, transport } = await createMcpServerForUser(username);
       session = { transport, server, username };
-      // Session will be added to map in onsessioninitialized callback
     } catch (error: any) {
       res.status(500).json({
         error: "Failed to initialize MCP server",
@@ -156,7 +152,6 @@ export async function handleMcpRequest(
     return;
   }
 
-  // Verify session belongs to the correct user
   if (session.username !== username) {
     res.status(403).json({
       error: "Session mismatch",
@@ -165,7 +160,6 @@ export async function handleMcpRequest(
     return;
   }
 
-  // Handle the request through the transport
   await session.transport.handleRequest(req, res, req.body);
 }
 

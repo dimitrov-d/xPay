@@ -4,11 +4,14 @@ import { db } from "../config/database";
 import { endpoints, users } from "../db/schema";
 import {
   createEndpointSchema,
+  deleteEndpointParamsSchema,
   getEndpointParamsSchema,
   getUserEndpointsParamsSchema,
   listEndpointsQuerySchema,
+  updateEndpointSchema,
   type CreateEndpointDto,
   type ListEndpointsQueryDto,
+  type UpdateEndpointDto,
 } from "../dto/endpoints.dto";
 import {
   AuthenticatedRequest,
@@ -235,6 +238,124 @@ router.get(
       });
     } catch (error) {
       console.error("Error fetching user endpoints:", error);
+      return res.status(500).json({
+        error: "Internal server error",
+      });
+    }
+  }
+);
+
+/**
+ * PUT /endpoints/:id
+ * Update an endpoint (requires authentication)
+ */
+router.put(
+  "/:id",
+  verifyWalletSignature,
+  validateParams(getEndpointParamsSchema),
+  validateBody(updateEndpointSchema),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { id } = req.validatedParams;
+      const walletAddress = req.walletAddress!;
+      const data = req.body as UpdateEndpointDto;
+
+      const [existingEndpoint] = await db
+        .select()
+        .from(endpoints)
+        .where(eq(endpoints.id, id))
+        .limit(1);
+
+      if (!existingEndpoint) {
+        return res.status(404).json({
+          error: "Endpoint not found",
+        });
+      }
+
+      if (existingEndpoint.userWallet !== walletAddress) {
+        return res.status(403).json({
+          error: "You do not have permission to update this endpoint",
+        });
+      }
+
+      const updateData: any = {
+        updatedAt: new Date(),
+      };
+
+      if (data.name !== undefined) updateData.name = data.name;
+      if (data.description !== undefined)
+        updateData.description = data.description;
+      if (data.originalUrl !== undefined)
+        updateData.originalUrl = data.originalUrl;
+      if (data.httpMethod !== undefined)
+        updateData.httpMethod = data.httpMethod.toUpperCase();
+      if (data.paymentAmount !== undefined)
+        updateData.paymentAmount = data.paymentAmount.toString();
+      if (data.tokenType !== undefined) updateData.tokenType = data.tokenType;
+      if (data.customAuthHeaders !== undefined)
+        updateData.customAuthHeaders = data.customAuthHeaders;
+      if (data.sampleBody !== undefined)
+        updateData.sampleBody = data.sampleBody;
+      if (data.sampleResponse !== undefined)
+        updateData.sampleResponse = data.sampleResponse;
+
+      const [updatedEndpoint] = await db
+        .update(endpoints)
+        .set(updateData)
+        .where(eq(endpoints.id, id))
+        .returning();
+
+      return res.json({
+        message: "Endpoint updated successfully",
+        endpoint: updatedEndpoint,
+      });
+    } catch (error) {
+      console.error("Error updating endpoint:", error);
+      return res.status(500).json({
+        error: "Internal server error",
+      });
+    }
+  }
+);
+
+/**
+ * DELETE /endpoints/:id
+ * Delete an endpoint (requires authentication)
+ */
+router.delete(
+  "/:id",
+  verifyWalletSignature,
+  validateParams(deleteEndpointParamsSchema),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { id } = req.validatedParams;
+      const walletAddress = req.walletAddress!;
+
+      const [existingEndpoint] = await db
+        .select()
+        .from(endpoints)
+        .where(eq(endpoints.id, id))
+        .limit(1);
+
+      if (!existingEndpoint) {
+        return res.status(404).json({
+          error: "Endpoint not found",
+        });
+      }
+
+      if (existingEndpoint.userWallet !== walletAddress) {
+        return res.status(403).json({
+          error: "You do not have permission to delete this endpoint",
+        });
+      }
+
+      await db.delete(endpoints).where(eq(endpoints.id, id));
+
+      return res.json({
+        message: "Endpoint deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting endpoint:", error);
       return res.status(500).json({
         error: "Internal server error",
       });

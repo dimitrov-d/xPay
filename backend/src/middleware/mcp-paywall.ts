@@ -54,7 +54,6 @@ export function createMcpPaywallMiddlewareFactory() {
     try {
       const { username } = req.params;
 
-      // List of MCP protocol methods that should bypass payment
       const bypassMethods = [
         "initialize",
         "initialized",
@@ -66,13 +65,10 @@ export function createMcpPaywallMiddlewareFactory() {
         "prompts/get",
       ];
 
-      // Check if this is a protocol method that should bypass payment
       if (req.body?.method && bypassMethods.includes(req.body.method)) {
         return next();
       }
 
-      // For tool calls, apply payment verification
-      // Extract tool name from MCP request
       const toolName = req.body?.params?.name;
 
       if (!toolName) {
@@ -82,7 +78,6 @@ export function createMcpPaywallMiddlewareFactory() {
         });
       }
 
-      // Look up the endpoint by username and tool name
       const [endpoint] = await db
         .select({
           id: endpoints.id,

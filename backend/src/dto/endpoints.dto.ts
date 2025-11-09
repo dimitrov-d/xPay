@@ -73,9 +73,57 @@ export const getUserEndpointsParamsSchema = z.object({
   wallet: z.string().min(1, "Wallet address is required"),
 });
 
+export const updateEndpointSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Endpoint name is required")
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      "Endpoint name can only contain letters, numbers, hyphens, and underscores"
+    )
+    .optional(),
+  description: z.string().min(1, "Description is required").optional(),
+  originalUrl: z
+    .string()
+    .url("Invalid URL format")
+    .refine(
+      (url) => {
+        try {
+          const parsed = new URL(url);
+          return ["http:", "https:"].includes(parsed.protocol);
+        } catch {
+          return false;
+        }
+      },
+      { message: "URL must use http or https protocol" }
+    )
+    .optional(),
+  httpMethod: z
+    .enum(HTTP_METHODS, {
+      errorMap: () => ({ message: "Invalid HTTP method" }),
+    })
+    .optional(),
+  paymentAmount: z
+    .number()
+    .nonnegative("Payment amount must be a non-negative number")
+    .optional(),
+  tokenType: z.string().min(1, "Token type is required").optional(),
+  customAuthHeaders: z.record(z.string(), z.string()).optional().nullable(),
+  sampleBody: z.any().optional().nullable(),
+  sampleResponse: z.any().optional().nullable(),
+});
+
+export const deleteEndpointParamsSchema = z.object({
+  id: z.string().uuid("Invalid endpoint ID format"),
+});
+
 export type CreateEndpointDto = z.infer<typeof createEndpointSchema>;
 export type ListEndpointsQueryDto = z.infer<typeof listEndpointsQuerySchema>;
 export type GetEndpointParamsDto = z.infer<typeof getEndpointParamsSchema>;
 export type GetUserEndpointsParamsDto = z.infer<
   typeof getUserEndpointsParamsSchema
+>;
+export type UpdateEndpointDto = z.infer<typeof updateEndpointSchema>;
+export type DeleteEndpointParamsDto = z.infer<
+  typeof deleteEndpointParamsSchema
 >;

@@ -1,25 +1,60 @@
 "use client";
 
 import { Footer } from "@/components/landing/Footer";
-import { Header } from "@/components/landing/Header";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
-import { Check, Copy, Loader2, Wallet } from "lucide-react";
+import { Check, Copy, Loader2, Wallet, AlertTriangle, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getCurrentUser, updateUsername } from "@/lib/api";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function WalletPage() {
   const router = useRouter();
   const { currentUser } = useCurrentUser();
   const { solanaAddress } = useSolanaAddress();
   const [copied, setCopied] = useState(false);
+  const [username, setUsername] = useState("");
+  const [newUsername, setNewUsername] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
       router.push("/");
+      return;
     }
-  }, [currentUser, router]);
+    loadUser();
+  }, [currentUser, router, solanaAddress]);
+
+  const loadUser = async () => {
+    if (!solanaAddress) return;
+    try {
+      setLoading(true);
+      const user = await getCurrentUser(solanaAddress);
+      setUsername(user.username);
+      setNewUsername(user.username);
+    } catch (error) {
+      console.log("User not found");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCopy = async () => {
     if (solanaAddress) {
@@ -29,22 +64,44 @@ export default function WalletPage() {
     }
   };
 
+  const handleUsernameChange = () => {
+    if (newUsername !== username) {
+      setShowWarning(true);
+    }
+  };
+
+  const confirmUsernameChange = async () => {
+    if (!solanaAddress || !newUsername) return;
+    try {
+      setSaving(true);
+      await updateUsername(newUsername, solanaAddress);
+      setUsername(newUsername);
+      toast.success("Username updated successfully");
+      toast.warning("Note: All existing proxy URLs have changed. Old endpoints will stop working.");
+      setShowWarning(false);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update username");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (!currentUser) {
     return null;
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <DashboardHeader />
       <main className="flex-1 pt-24 pb-12 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="space-y-8">
             <div className="text-center space-y-4">
               <h1 className="text-4xl md:text-5xl font-bold">
-                Your Solana Wallet
+                Wallet & Profile
               </h1>
               <p className="text-xl text-muted-foreground">
-                Your embedded Solana wallet is ready to use
+                Manage your wallet and profile settings
               </p>
             </div>
 
@@ -99,6 +156,66 @@ export default function WalletPage() {
               </CardContent>
             </Card>
 
+            <Card className="shadow-elegant">
+              <CardHeader>
+                <CardTitle>Username</CardTitle>
+                <CardDescription>
+                  Your username is used in proxy URLs. Changing it will break existing endpoints.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {loading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-accent" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="username">Username</Label>
+                      <Input
+                        id="username"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                        pattern="^[a-zA-Z0-9_-]+$"
+                        placeholder="your-username"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Only letters, numbers, hyphens, and underscores
+                      </p>
+                    </div>
+                    {newUsername !== username && (
+                      <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                        <AlertTriangle className="w-5 h-5 text-yellow-500 mt-0.5 shrink-0" />
+                        <div className="text-sm text-yellow-600 dark:text-yellow-400">
+                          <p className="font-semibold mb-1">Warning: Not Backwards Compatible</p>
+                          <p>
+                            Changing your username will cause all existing proxy URLs to change.
+                            Old endpoints will stop working and you'll need to update all integrations.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <Button
+                      onClick={handleUsernameChange}
+                      disabled={newUsername === username || !newUsername || saving}
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          Save Username
+                        </>
+                      )}
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
             <div className="grid md:grid-cols-2 gap-4">
               <Card>
                 <CardHeader>
@@ -124,19 +241,45 @@ export default function WalletPage() {
                 </CardContent>
               </Card>
             </div>
-
-            <div className="flex justify-center pt-4">
-              <Button
-                variant="outline"
-                onClick={() => router.push("/")}
-              >
-                Back to Home
-              </Button>
-            </div>
           </div>
         </div>
       </main>
       <Footer />
+
+      <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-yellow-500" />
+              Username Change Warning
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                Changing your username is <strong>not backwards compatible</strong>.
+              </p>
+              <p>
+                This will cause all existing proxy URLs to change from:
+              </p>
+              <code className="block p-2 bg-muted rounded text-xs">
+                /{username}/endpoint-name
+              </code>
+              <p>to:</p>
+              <code className="block p-2 bg-muted rounded text-xs">
+                /{newUsername}/endpoint-name
+              </code>
+              <p className="pt-2">
+                <strong>All existing integrations using your old URLs will break.</strong> You'll need to update all clients and integrations.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmUsernameChange} className="bg-yellow-500 hover:bg-yellow-600">
+              I Understand, Change Username
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

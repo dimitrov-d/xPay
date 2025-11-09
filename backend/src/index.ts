@@ -4,6 +4,7 @@ import express, { NextFunction, Request, Response } from "express";
 import endpointsRouter from "./routes/endpoints";
 import mcpRouter from "./routes/mcp";
 import proxyRouter from "./routes/proxy";
+import userRouter from "./routes/user";
 
 dotenv.config();
 
@@ -26,6 +27,8 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 app.use("/endpoints", endpointsRouter);
+
+app.use("/user", userRouter);
 
 app.use("/mcp", mcpRouter);
 
