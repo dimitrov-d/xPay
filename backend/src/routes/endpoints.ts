@@ -1,7 +1,7 @@
-import { and, count, eq } from "drizzle-orm";
-import { Response, Router } from "express";
-import { db } from "../config/database";
-import { endpoints, users } from "../db/schema";
+import { and, count, eq } from 'drizzle-orm';
+import { Response, Router } from 'express';
+import { db } from '../config/database';
+import { endpoints, users } from '../db/schema';
 import {
   createEndpointSchema,
   deleteEndpointParamsSchema,
@@ -12,13 +12,9 @@ import {
   type CreateEndpointDto,
   type ListEndpointsQueryDto,
   type UpdateEndpointDto,
-} from "../dto/endpoints.dto";
-import { AuthenticatedRequest, verifyAuth } from "../middleware/auth";
-import {
-  validateBody,
-  validateParams,
-  validateQuery,
-} from "../middleware/validation";
+} from '../dto/endpoints.dto';
+import { AuthenticatedRequest, verifyAuth } from '../middleware/auth';
+import { validateBody, validateParams, validateQuery } from '../middleware/validation';
 
 const router = Router();
 
@@ -26,48 +22,44 @@ const router = Router();
  * GET /endpoints
  * List all endpoints (public, for marketplace)
  */
-router.get(
-  "/",
-  validateQuery(listEndpointsQuerySchema),
-  async (req, res: Response) => {
-    try {
-      const { page, limit } = req.validatedQuery as ListEndpointsQueryDto;
-      const offset = (page - 1) * limit;
+router.get('/', validateQuery(listEndpointsQuerySchema), async (req, res: Response) => {
+  try {
+    const { page, limit } = req.validatedQuery as ListEndpointsQueryDto;
+    const offset = (page - 1) * limit;
 
-      const allEndpoints = await db
-        .select()
-        .from(endpoints)
-        .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
-        .limit(limit)
-        .offset(offset)
-        .orderBy(endpoints.createdAt);
+    const allEndpoints = await db
+      .select()
+      .from(endpoints)
+      .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
+      .limit(limit)
+      .offset(offset)
+      .orderBy(endpoints.createdAt);
 
-      const [{ total }] = await db.select({ total: count() }).from(endpoints);
+    const [{ total }] = await db.select({ total: count() }).from(endpoints);
 
-      return res.json({
-        endpoints: allEndpoints,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching endpoints:", error);
-      return res.status(500).json({
-        error: "Internal server error",
-      });
-    }
+    return res.json({
+      endpoints: allEndpoints,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching endpoints:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
   }
-);
+});
 
 /**
  * POST /endpoints
  * Register a new endpoint (requires authentication)
  */
 router.post(
-  "/",
+  '/',
   verifyAuth,
   validateBody(createEndpointSchema),
   async (req: AuthenticatedRequest, res: Response) => {
@@ -81,12 +73,9 @@ router.post(
         .where(eq(users.username, data.username))
         .limit(1);
 
-      if (
-        existingUser.length > 0 &&
-        existingUser[0].walletAddress !== walletAddress
-      ) {
+      if (existingUser.length > 0 && existingUser[0].walletAddress !== walletAddress) {
         return res.status(409).json({
-          error: "Username already taken",
+          error: 'Username already taken',
         });
       }
 
@@ -112,15 +101,14 @@ router.post(
           and(
             eq(endpoints.userWallet, walletAddress),
             eq(endpoints.name, data.name),
-            eq(endpoints.httpMethod, data.httpMethod.toUpperCase())
-          )
+            eq(endpoints.httpMethod, data.httpMethod.toUpperCase()),
+          ),
         )
         .limit(1);
 
       if (existingEndpoint.length > 0) {
         return res.status(409).json({
-          error:
-            "Endpoint with this name and method already exists for this user",
+          error: 'Endpoint with this name and method already exists for this user',
         });
       }
 
@@ -142,72 +130,68 @@ router.post(
         .returning();
 
       return res.status(201).json({
-        message: "Endpoint registered successfully",
+        message: 'Endpoint registered successfully',
         endpoint: newEndpoint,
       });
     } catch (error) {
-      console.error("Error registering endpoint:", error);
+      console.error('Error registering endpoint:', error);
       return res.status(500).json({
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
-  }
+  },
 );
 
 /**
  * GET /endpoints/:id
  * Get specific endpoint details
  */
-router.get(
-  "/:id",
-  validateParams(getEndpointParamsSchema),
-  async (req, res: Response) => {
-    try {
-      const { id } = req.validatedParams;
+router.get('/:id', validateParams(getEndpointParamsSchema), async (req, res: Response) => {
+  try {
+    const { id } = req.validatedParams;
 
-      const [endpoint] = await db
-        .select({
-          id: endpoints.id,
-          username: users.username,
-          name: endpoints.name,
-          description: endpoints.description,
-          originalUrl: endpoints.originalUrl,
-          httpMethod: endpoints.httpMethod,
-          paymentAmount: endpoints.paymentAmount,
-          tokenType: endpoints.tokenType,
-          customAuthHeaders: endpoints.customAuthHeaders,
-          sampleBody: endpoints.sampleBody,
-          sampleResponse: endpoints.sampleResponse,
-          createdAt: endpoints.createdAt,
-          updatedAt: endpoints.updatedAt,
-        })
-        .from(endpoints)
-        .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
-        .where(eq(endpoints.id, id))
-        .limit(1);
+    const [endpoint] = await db
+      .select({
+        id: endpoints.id,
+        username: users.username,
+        name: endpoints.name,
+        description: endpoints.description,
+        originalUrl: endpoints.originalUrl,
+        httpMethod: endpoints.httpMethod,
+        paymentAmount: endpoints.paymentAmount,
+        tokenType: endpoints.tokenType,
+        customAuthHeaders: endpoints.customAuthHeaders,
+        sampleBody: endpoints.sampleBody,
+        sampleResponse: endpoints.sampleResponse,
+        createdAt: endpoints.createdAt,
+        updatedAt: endpoints.updatedAt,
+      })
+      .from(endpoints)
+      .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
+      .where(eq(endpoints.id, id))
+      .limit(1);
 
-      if (!endpoint) {
-        return res.status(404).json({
-          error: "Endpoint not found",
-        });
-      }
-
-      return res.json(endpoint);
-    } catch (error) {
-      console.error("Error fetching endpoint:", error);
-      return res.status(500).json({
-        error: "Internal server error",
+    if (!endpoint) {
+      return res.status(404).json({
+        error: 'Endpoint not found',
       });
     }
+
+    return res.json(endpoint);
+  } catch (error) {
+    console.error('Error fetching endpoint:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
   }
-);
+});
 
 /**
  * GET /endpoints/user/:wallet
  * Get all endpoints for a specific user
  */
 router.get(
-  "/user/:wallet",
+  '/user/:wallet',
   validateParams(getUserEndpointsParamsSchema),
   async (req, res: Response) => {
     try {
@@ -225,12 +209,12 @@ router.get(
         count: userEndpoints.length,
       });
     } catch (error) {
-      console.error("Error fetching user endpoints:", error);
+      console.error('Error fetching user endpoints:', error);
       return res.status(500).json({
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
-  }
+  },
 );
 
 /**
@@ -238,7 +222,7 @@ router.get(
  * Update an endpoint (requires authentication)
  */
 router.put(
-  "/:id",
+  '/:id',
   verifyAuth,
   validateParams(getEndpointParamsSchema),
   validateBody(updateEndpointSchema),
@@ -256,13 +240,13 @@ router.put(
 
       if (!existingEndpoint) {
         return res.status(404).json({
-          error: "Endpoint not found",
+          error: 'Endpoint not found',
         });
       }
 
       if (existingEndpoint.userWallet !== walletAddress) {
         return res.status(403).json({
-          error: "You do not have permission to update this endpoint",
+          error: 'You do not have permission to update this endpoint',
         });
       }
 
@@ -271,21 +255,16 @@ router.put(
       };
 
       if (data.name !== undefined) updateData.name = data.name;
-      if (data.description !== undefined)
-        updateData.description = data.description;
-      if (data.originalUrl !== undefined)
-        updateData.originalUrl = data.originalUrl;
-      if (data.httpMethod !== undefined)
-        updateData.httpMethod = data.httpMethod.toUpperCase();
+      if (data.description !== undefined) updateData.description = data.description;
+      if (data.originalUrl !== undefined) updateData.originalUrl = data.originalUrl;
+      if (data.httpMethod !== undefined) updateData.httpMethod = data.httpMethod.toUpperCase();
       if (data.paymentAmount !== undefined)
         updateData.paymentAmount = data.paymentAmount.toString();
       if (data.tokenType !== undefined) updateData.tokenType = data.tokenType;
       if (data.customAuthHeaders !== undefined)
         updateData.customAuthHeaders = data.customAuthHeaders;
-      if (data.sampleBody !== undefined)
-        updateData.sampleBody = data.sampleBody;
-      if (data.sampleResponse !== undefined)
-        updateData.sampleResponse = data.sampleResponse;
+      if (data.sampleBody !== undefined) updateData.sampleBody = data.sampleBody;
+      if (data.sampleResponse !== undefined) updateData.sampleResponse = data.sampleResponse;
 
       const [updatedEndpoint] = await db
         .update(endpoints)
@@ -294,16 +273,16 @@ router.put(
         .returning();
 
       return res.json({
-        message: "Endpoint updated successfully",
+        message: 'Endpoint updated successfully',
         endpoint: updatedEndpoint,
       });
     } catch (error) {
-      console.error("Error updating endpoint:", error);
+      console.error('Error updating endpoint:', error);
       return res.status(500).json({
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
-  }
+  },
 );
 
 /**
@@ -311,7 +290,7 @@ router.put(
  * Delete an endpoint (requires authentication)
  */
 router.delete(
-  "/:id",
+  '/:id',
   verifyAuth,
   validateParams(deleteEndpointParamsSchema),
   async (req: AuthenticatedRequest, res: Response) => {
@@ -327,28 +306,28 @@ router.delete(
 
       if (!existingEndpoint) {
         return res.status(404).json({
-          error: "Endpoint not found",
+          error: 'Endpoint not found',
         });
       }
 
       if (existingEndpoint.userWallet !== walletAddress) {
         return res.status(403).json({
-          error: "You do not have permission to delete this endpoint",
+          error: 'You do not have permission to delete this endpoint',
         });
       }
 
       await db.delete(endpoints).where(eq(endpoints.id, id));
 
       return res.json({
-        message: "Endpoint deleted successfully",
+        message: 'Endpoint deleted successfully',
       });
     } catch (error) {
-      console.error("Error deleting endpoint:", error);
+      console.error('Error deleting endpoint:', error);
       return res.status(500).json({
-        error: "Internal server error",
+        error: 'Internal server error',
       });
     }
-  }
+  },
 );
 
 export default router;

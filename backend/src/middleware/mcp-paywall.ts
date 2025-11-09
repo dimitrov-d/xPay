@@ -1,9 +1,9 @@
-import { solana } from "@faremeter/info";
-import { express as faremeter } from "@faremeter/middleware";
-import { and, eq } from "drizzle-orm";
-import { NextFunction, Request, Response } from "express";
-import { db } from "../config/database";
-import { endpoints, users } from "../db/schema";
+import { solana } from '@faremeter/info';
+import { express as faremeter } from '@faremeter/middleware';
+import { and, eq } from 'drizzle-orm';
+import { NextFunction, Request, Response } from 'express';
+import { db } from '../config/database';
+import { endpoints, users } from '../db/schema';
 
 /**
  * Creates a FareMeter middleware for MCP server endpoints
@@ -18,21 +18,19 @@ async function createMcpPaywallMiddleware(
   asset: string,
   userWallet: string,
   resource: string,
-  description: string
+  description: string,
 ) {
   const amount = parseFloat(paymentAmount);
 
   if (isNaN(amount) || amount <= 0) {
-    throw new Error(
-      `Invalid payment amount: ${paymentAmount}. Amount must be a positive number.`
-    );
+    throw new Error(`Invalid payment amount: ${paymentAmount}. Amount must be a positive number.`);
   }
 
   return await faremeter.createMiddleware({
-    facilitatorURL: "https://facilitator.corbits.dev",
+    facilitatorURL: 'https://facilitator.corbits.dev',
     accepts: solana
       .x402Exact({
-        network: "mainnet-beta",
+        network: 'mainnet-beta',
         asset: asset as any,
         amount: `${+paymentAmount * 10 ** 6}`,
         payTo: userWallet,
@@ -55,14 +53,14 @@ export function createMcpPaywallMiddlewareFactory() {
       const { username } = req.params;
 
       const bypassMethods = [
-        "initialize",
-        "initialized",
-        "notifications/initialized",
-        "tools/list",
-        "prompts/list",
-        "resources/list",
-        "resources/read",
-        "prompts/get",
+        'initialize',
+        'initialized',
+        'notifications/initialized',
+        'tools/list',
+        'prompts/list',
+        'resources/list',
+        'resources/read',
+        'prompts/get',
       ];
 
       if (req.body?.method && bypassMethods.includes(req.body.method)) {
@@ -73,8 +71,8 @@ export function createMcpPaywallMiddlewareFactory() {
 
       if (!toolName) {
         return res.status(400).json({
-          error: "Invalid request",
-          message: "Tool name is required for tool calls",
+          error: 'Invalid request',
+          message: 'Tool name is required for tool calls',
         });
       }
 
@@ -93,28 +91,28 @@ export function createMcpPaywallMiddlewareFactory() {
 
       if (!endpoint) {
         return res.status(404).json({
-          error: "Tool not found",
+          error: 'Tool not found',
           message: `No tool found with name: ${toolName} for user: ${username}`,
         });
       }
 
-      const resource = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+      const resource = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
       const paywallMiddleware = await createMcpPaywallMiddleware(
         endpoint.paymentAmount,
         endpoint.tokenType,
         endpoint.userWallet,
         resource,
-        endpoint.description
+        endpoint.description,
       );
 
       return paywallMiddleware(req, res, next);
     } catch (error: any) {
-      console.error("Error in MCP paywall middleware:", error);
+      console.error('Error in MCP paywall middleware:', error);
 
       return res.status(500).json({
-        error: "Internal server error",
-        message: error.message || "Failed to verify payment",
+        error: 'Internal server error',
+        message: error.message || 'Failed to verify payment',
       });
     }
   };

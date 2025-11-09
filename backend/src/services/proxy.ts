@@ -1,5 +1,5 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { Request } from "express";
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Request } from 'express';
 
 export interface ProxyConfig {
   originalUrl: string;
@@ -10,10 +10,7 @@ export interface ProxyConfig {
 /**
  * Forwards a request to the original API endpoint
  */
-export async function forwardRequest(
-  req: Request,
-  config: ProxyConfig
-): Promise<AxiosResponse> {
+export async function forwardRequest(req: Request, config: ProxyConfig): Promise<AxiosResponse> {
   const { originalUrl, httpMethod, customAuthHeaders } = config;
 
   const url = new URL(originalUrl);
@@ -24,13 +21,13 @@ export async function forwardRequest(
   const headers: Record<string, string> = {
     ...(req.headers as any),
     host: url.host,
-    "x-forwarded-for": req.ip || req.socket.remoteAddress || "",
-    "x-forwarded-proto": req.protocol,
+    'x-forwarded-for': req.ip || req.socket.remoteAddress || '',
+    'x-forwarded-proto': req.protocol,
   };
 
-  delete headers["content-length"];
-  delete headers["connection"];
-  delete headers["host"];
+  delete headers['content-length'];
+  delete headers['connection'];
+  delete headers['host'];
 
   if (customAuthHeaders) Object.assign(headers, customAuthHeaders);
 
@@ -47,16 +44,20 @@ export async function forwardRequest(
     return await axios(axiosConfig);
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw {
-        status: error.response?.status || 502,
-        message: error.message,
-        data: error.response?.data || { error: "Proxy request failed" },
-      };
+      throw new Error(
+        JSON.stringify({
+          status: error.response?.status || 502,
+          message: error.message,
+          data: error.response?.data || { error: 'Proxy request failed' },
+        }),
+      );
     }
-    throw {
-      status: 502,
-      message: "Unknown error occurred",
-      data: { error: "Proxy request failed" },
-    };
+    throw new Error(
+      JSON.stringify({
+        status: 502,
+        message: 'Unknown error occurred',
+        data: { error: 'Proxy request failed' },
+      }),
+    );
   }
 }

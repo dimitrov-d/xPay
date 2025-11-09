@@ -1,29 +1,27 @@
-import { wrap as wrapFetch } from "@faremeter/fetch";
-import { lookupKnownSPLToken } from "@faremeter/info/solana";
-import { createPaymentHandler } from "@faremeter/payment-solana/exact";
+import { wrap as wrapFetch } from '@faremeter/fetch';
+import { lookupKnownSPLToken } from '@faremeter/info/solana';
+import { createPaymentHandler } from '@faremeter/payment-solana/exact';
 import {
   clusterApiUrl,
   Connection,
   Keypair,
   PublicKey,
   VersionedTransaction,
-} from "@solana/web3.js";
-import * as fs from "fs";
+} from '@solana/web3.js';
+import * as fs from 'fs';
 
 /**
  * Test the paywall using Corbits + Faremeter fetch wrapper with payment
  */
 async function main() {
   // Load keypair from file
-  const keypairData = JSON.parse(
-    fs.readFileSync("./payer-wallet.json", "utf-8")
-  );
+  const keypairData = JSON.parse(fs.readFileSync('./payer-wallet.json', 'utf-8'));
   const keypair = Keypair.fromSecretKey(Uint8Array.from(keypairData));
 
-  const network = "mainnet-beta";
+  const network = 'mainnet-beta';
   const connection = new Connection(clusterApiUrl(network));
   // Lookup USDC mint address
-  const usdcMint = new PublicKey(lookupKnownSPLToken(network, "USDC")!.address);
+  const usdcMint = new PublicKey(lookupKnownSPLToken(network, 'USDC')!.address);
 
   // Create wallet interface
   const wallet = {
@@ -42,13 +40,13 @@ async function main() {
   });
 
   // Make a paid API request
-  const response = await fetchWithPayer("https://helius.api.corbits.dev", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+  const response = await fetchWithPayer('https://helius.api.corbits.dev', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      jsonrpc: "2.0",
+      jsonrpc: '2.0',
       id: 1,
-      method: "getBlockHeight",
+      method: 'getBlockHeight',
     }),
   });
 

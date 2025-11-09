@@ -1,7 +1,7 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d"; // Default 7 days
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'; // Default 7 days
 
 export interface JWTPayload {
   walletAddress: string;
@@ -14,10 +14,7 @@ export interface JWTPayload {
  * @param username - User's username
  * @returns JWT token string
  */
-export function generateToken(
-  walletAddress: string,
-  username: string
-): string {
+export function generateToken(walletAddress: string, username: string): string {
   const payload: JWTPayload = {
     walletAddress,
     username,
@@ -38,7 +35,7 @@ export function verifyToken(token: string): JWTPayload | null {
     const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
     return decoded;
   } catch (error) {
-    console.error("JWT verification failed:", error);
+    console.error('JWT verification failed:', error);
     return null;
   }
 }
@@ -55,4 +52,3 @@ export function decodeToken(token: string): JWTPayload | null {
     return null;
   }
 }
-

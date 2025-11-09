@@ -1,12 +1,12 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { eq } from "drizzle-orm";
-import { Request, Response } from "express";
-import { randomUUID } from "node:crypto";
-import { db } from "../config/database";
-import { endpoints, users } from "../db/schema";
-import { generateToolInputSchema } from "../utils/schema";
-import { forwardRequest } from "./proxy";
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { eq } from 'drizzle-orm';
+import { Request, Response } from 'express';
+import { randomUUID } from 'node:crypto';
+import { db } from '../config/database';
+import { endpoints, users } from '../db/schema';
+import { generateToolInputSchema } from '../utils/schema';
+import { forwardRequest } from './proxy';
 
 const sessions = new Map<
   string,
@@ -22,7 +22,7 @@ const sessions = new Map<
  * Dynamically registers all user's endpoints as MCP tools
  */
 async function createMcpServerForUser(
-  username: string
+  username: string,
 ): Promise<{ server: McpServer; transport: StreamableHTTPServerTransport }> {
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: () => randomUUID(),
@@ -30,7 +30,7 @@ async function createMcpServerForUser(
       sessions.set(sessionId, { transport, server, username });
     },
     enableDnsRebindingProtection: true,
-    allowedHosts: ["127.0.0.1", "localhost", "localhost:3000"],
+    allowedHosts: ['127.0.0.1', 'localhost', 'localhost:3000'],
   });
 
   transport.onclose = () => {
@@ -41,7 +41,7 @@ async function createMcpServerForUser(
 
   const server = new McpServer({
     name: `${username}-api-server`,
-    version: "1.0.0",
+    version: '1.0.0',
   });
 
   const userEndpoints = await db
@@ -63,10 +63,7 @@ async function createMcpServerForUser(
 
   for (const endpoint of userEndpoints) {
     const toolName = `${endpoint.name}`;
-    const inputSchema = generateToolInputSchema(
-      endpoint.sampleBody,
-      endpoint.httpMethod
-    );
+    const inputSchema = generateToolInputSchema(endpoint.sampleBody, endpoint.httpMethod);
 
     server.registerTool(
       toolName,
@@ -79,7 +76,7 @@ async function createMcpServerForUser(
         try {
           const req = { body: args, method: endpoint.httpMethod } as any;
 
-          if (endpoint.httpMethod.toUpperCase() === "GET" && args.query) {
+          if (endpoint.httpMethod.toUpperCase() === 'GET' && args.query) {
             req.query = args.query;
             req.body = {};
           }
@@ -87,16 +84,13 @@ async function createMcpServerForUser(
           const response = await forwardRequest(req, {
             originalUrl: endpoint.originalUrl,
             httpMethod: endpoint.httpMethod,
-            customAuthHeaders: endpoint.customAuthHeaders as Record<
-              string,
-              string
-            > | null,
+            customAuthHeaders: endpoint.customAuthHeaders as Record<string, string> | null,
           });
 
           return {
             content: [
               {
-                type: "text" as const,
+                type: 'text' as const,
                 text: JSON.stringify(response.data, null, 2),
               },
             ],
@@ -105,14 +99,14 @@ async function createMcpServerForUser(
           return {
             content: [
               {
-                type: "text" as const,
-                text: `Error calling API: ${error.message || "Unknown error"}`,
+                type: 'text' as const,
+                text: `Error calling API: ${error.message || 'Unknown error'}`,
               },
             ],
             isError: true,
           };
         }
-      }
+      },
     );
   }
 
@@ -128,34 +122,34 @@ async function createMcpServerForUser(
 export async function handleMcpRequest(
   req: Request,
   res: Response,
-  username: string
+  username: string,
 ): Promise<void> {
-  const sessionId = req.headers["mcp-session-id"] as string | undefined;
+  const sessionId = req.headers['mcp-session-id'] as string | undefined;
   let session = sessionId ? sessions.get(sessionId) : undefined;
 
-  if (!session && req.body?.method === "initialize") {
+  if (!session && req.body?.method === 'initialize') {
     try {
       const { server, transport } = await createMcpServerForUser(username);
       session = { transport, server, username };
     } catch (error: any) {
       res.status(500).json({
-        error: "Failed to initialize MCP server",
+        error: 'Failed to initialize MCP server',
         message: error.message,
       });
       return;
     }
   } else if (!session) {
     res.status(400).json({
-      error: "Invalid session",
-      message: "No active session found. Please initialize first.",
+      error: 'Invalid session',
+      message: 'No active session found. Please initialize first.',
     });
     return;
   }
 
   if (session.username !== username) {
     res.status(403).json({
-      error: "Session mismatch",
-      message: "Session does not belong to this user",
+      error: 'Session mismatch',
+      message: 'Session does not belong to this user',
     });
     return;
   }
@@ -169,23 +163,23 @@ export async function handleMcpRequest(
 export async function handleSessionRequest(
   req: Request,
   res: Response,
-  username: string
+  username: string,
 ): Promise<void> {
-  const sessionId = req.headers["mcp-session-id"] as string | undefined;
+  const sessionId = req.headers['mcp-session-id'] as string | undefined;
   const session = sessionId ? sessions.get(sessionId) : undefined;
 
   if (!session) {
     res.status(400).json({
-      error: "Invalid session",
-      message: "No active session found",
+      error: 'Invalid session',
+      message: 'No active session found',
     });
     return;
   }
 
   if (session.username !== username) {
     res.status(403).json({
-      error: "Session mismatch",
-      message: "Session does not belong to this user",
+      error: 'Session mismatch',
+      message: 'Session does not belong to this user',
     });
     return;
   }

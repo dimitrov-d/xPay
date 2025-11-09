@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { ZodError, ZodSchema } from "zod";
+import { NextFunction, Request, Response } from 'express';
+import { ZodError, ZodSchema } from 'zod';
 
 declare global {
   namespace Express {
@@ -18,9 +18,9 @@ export function validateBody(schema: ZodSchema) {
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({
-          error: "Validation error",
+          error: 'Validation error',
           details: error.errors.map((err) => ({
-            path: err.path.join("."),
+            path: err.path.join('.'),
             message: err.message,
           })),
         });
@@ -39,9 +39,9 @@ export function validateQuery(schema: ZodSchema) {
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({
-          error: "Validation error",
+          error: 'Validation error',
           details: error.errors.map((err) => ({
-            path: err.path.join("."),
+            path: err.path.join('.'),
             message: err.message,
           })),
         });
@@ -60,9 +60,9 @@ export function validateParams(schema: ZodSchema) {
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({
-          error: "Validation error",
+          error: 'Validation error',
           details: error.errors.map((err) => ({
-            path: err.path.join("."),
+            path: err.path.join('.'),
             message: err.message,
           })),
         });

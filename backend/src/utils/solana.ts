@@ -1,6 +1,6 @@
-import { PublicKey } from "@solana/web3.js";
-import bs58 from "bs58";
-import nacl from "tweetnacl";
+import { PublicKey } from '@solana/web3.js';
+import bs58 from 'bs58';
+import nacl from 'tweetnacl';
 
 /**
  * Verifies a Solana wallet signature
@@ -12,7 +12,7 @@ import nacl from "tweetnacl";
 export function verifySolanaSignature(
   walletAddress: string,
   message: string,
-  signature: string
+  signature: string,
 ): boolean {
   try {
     const publicKey = new PublicKey(walletAddress);
@@ -24,20 +24,16 @@ export function verifySolanaSignature(
     } catch {
       // If base58 fails, try base64
       try {
-        signatureBytes = Uint8Array.from(Buffer.from(signature, "base64"));
+        signatureBytes = Uint8Array.from(Buffer.from(signature, 'base64'));
       } catch {
-        console.error("Invalid signature format");
+        console.error('Invalid signature format');
         return false;
       }
     }
 
-    return nacl.sign.detached.verify(
-      messageBytes,
-      signatureBytes,
-      publicKey.toBytes()
-    );
+    return nacl.sign.detached.verify(messageBytes, signatureBytes, publicKey.toBytes());
   } catch (error) {
-    console.error("Error verifying signature:", error);
+    console.error('Error verifying signature:', error);
     return false;
   }
 }

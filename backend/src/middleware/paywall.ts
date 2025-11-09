@@ -1,9 +1,9 @@
-import { solana } from "@faremeter/info";
-import { express as faremeter } from "@faremeter/middleware";
-import { and, eq } from "drizzle-orm";
-import { NextFunction, Request, Response } from "express";
-import { db } from "../config/database";
-import { endpoints, users } from "../db/schema";
+import { solana } from '@faremeter/info';
+import { express as faremeter } from '@faremeter/middleware';
+import { and, eq } from 'drizzle-orm';
+import { NextFunction, Request, Response } from 'express';
+import { db } from '../config/database';
+import { endpoints, users } from '../db/schema';
 
 /**
  * Creates a FareMeter middleware for a specific endpoint configuration
@@ -18,14 +18,12 @@ async function createPaywallMiddleware(
   asset: string,
   userWallet: string,
   resource: string,
-  description: string
+  description: string,
 ) {
   const amount = parseFloat(paymentAmount);
 
   if (isNaN(amount) || amount <= 0) {
-    throw new Error(
-      `Invalid payment amount: ${paymentAmount}. Amount must be a positive number.`
-    );
+    throw new Error(`Invalid payment amount: ${paymentAmount}. Amount must be a positive number.`);
   }
 
   if (+paymentAmount <= 0) {
@@ -33,10 +31,10 @@ async function createPaywallMiddleware(
   }
 
   return await faremeter.createMiddleware({
-    facilitatorURL: "https://facilitator.corbits.dev",
+    facilitatorURL: 'https://facilitator.corbits.dev',
     accepts: solana
       .x402Exact({
-        network: "mainnet-beta",
+        network: 'mainnet-beta',
         asset: asset as any,
         amount: `${+paymentAmount * 10 ** 6}`,
         payTo: userWallet,
@@ -73,35 +71,35 @@ export function createPaywallMiddlewareFactory() {
           and(
             eq(users.username, username),
             eq(endpoints.name, endpointName),
-            eq(endpoints.httpMethod, httpMethod)
-          )
+            eq(endpoints.httpMethod, httpMethod),
+          ),
         )
         .limit(1);
 
       if (!endpoint) {
         return res.status(404).json({
-          error: "Endpoint not found",
+          error: 'Endpoint not found',
           message: `No endpoint found for ${username}/${endpointName} with method ${httpMethod}`,
         });
       }
 
-      const resource = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
+      const resource = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
       const paywallMiddleware = await createPaywallMiddleware(
         endpoint.paymentAmount,
         endpoint.tokenType,
         endpoint.userWallet,
         resource,
-        endpoint.description
+        endpoint.description,
       );
 
       return paywallMiddleware(req, res, next);
     } catch (error: any) {
-      console.error("Error in paywall middleware:", error);
+      console.error('Error in paywall middleware:', error);
 
       return res.status(500).json({
-        error: "Internal server error",
-        message: error.message || "Failed to verify payment",
+        error: 'Internal server error',
+        message: error.message || 'Failed to verify payment',
       });
     }
   };

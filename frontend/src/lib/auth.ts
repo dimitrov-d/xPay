@@ -91,7 +91,7 @@ export function getAuthHeaders(): Record<string, string> {
 
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
   };
 }
 
@@ -107,7 +107,7 @@ export function decodeToken(token: string): any {
       atob(base64)
         .split('')
         .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
+        .join(''),
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
@@ -121,8 +121,7 @@ export function decodeToken(token: string): any {
 export function isTokenExpired(token: string): boolean {
   const decoded = decodeToken(token);
   if (!decoded || !decoded.exp) return true;
-  
+
   const currentTime = Date.now() / 1000;
   return decoded.exp < currentTime;
 }
-

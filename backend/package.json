@@ -17,7 +17,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "nodemon src/index.ts",
-    "lint": "echo 'No lint script configured'",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix",
     "clean": "rm -rf dist node_modules",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -50,8 +51,10 @@
     "@types/node": "^24.10.0",
     "@types/uuid": "^11.0.0",
     "drizzle-kit": "^0.31.6",
+    "eslint-plugin-sonarjs": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }

@@ -6,7 +6,7 @@ import {
   LoginResponse,
   setAuthToken,
   setAuthUser,
-} from "./auth";
+} from './auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -80,15 +80,11 @@ export const authApi = {
   /**
    * Login with wallet signature
    */
-  async login(
-    walletAddress: string,
-    message: string,
-    signature: string
-  ): Promise<LoginResponse> {
+  async login(walletAddress: string, message: string, signature: string): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         walletAddress,
@@ -99,7 +95,7 @@ export const authApi = {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Failed to login");
+      throw new Error(error.error || 'Failed to login');
     }
 
     const data: LoginResponse = await response.json();
@@ -115,21 +111,6 @@ export const authApi = {
    * Logout and clear local storage
    */
   async logout(): Promise<void> {
-    const token = getAuthToken();
-
-    if (token) {
-      try {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } catch (error) {
-        console.error("Logout request failed:", error);
-      }
-    }
-
     // Always clear local storage
     clearAuthToken();
   },
@@ -167,19 +148,15 @@ export const authApi = {
 
 export const endpointsApi = {
   async getAllEndpoints(page = 1, limit = 20): Promise<PaginatedEndpoints> {
-    const response = await fetch(
-      `${API_BASE_URL}/endpoints?page=${page}&limit=${limit}`
-    );
-    if (!response.ok) throw new Error("Failed to fetch endpoints");
+    const response = await fetch(`${API_BASE_URL}/endpoints?page=${page}&limit=${limit}`);
+    if (!response.ok) throw new Error('Failed to fetch endpoints');
     const data = await response.json();
 
     // Transform nested structure to flat structure
-    const transformedEndpoints: Endpoint[] = data.endpoints.map(
-      (item: any) => ({
-        ...item.endpoints,
-        username: item.users?.username || undefined,
-      })
-    );
+    const transformedEndpoints: Endpoint[] = data.endpoints.map((item: any) => ({
+      ...item.endpoints,
+      username: item.users?.username || undefined,
+    }));
 
     return {
       endpoints: transformedEndpoints,
@@ -189,7 +166,7 @@ export const endpointsApi = {
 
   async getEndpoint(id: string): Promise<Endpoint> {
     const response = await fetch(`${API_BASE_URL}/endpoints/${id}`);
-    if (!response.ok) throw new Error("Failed to fetch endpoint");
+    if (!response.ok) throw new Error('Failed to fetch endpoint');
     return response.json();
   },
 
@@ -198,23 +175,17 @@ export const endpointsApi = {
     endpoints: Endpoint[];
     count: number;
   }> {
-    const response = await fetch(
-      `${API_BASE_URL}/endpoints/user/${walletAddress}`
-    );
-    if (!response.ok) throw new Error("Failed to fetch user endpoints");
+    const response = await fetch(`${API_BASE_URL}/endpoints/user/${walletAddress}`);
+    if (!response.ok) throw new Error('Failed to fetch user endpoints');
     const data = await response.json();
 
     // If endpoints don't have username, fetch it from user profile
-    if (
-      data.endpoints &&
-      data.endpoints.length > 0 &&
-      !data.endpoints[0].username
-    ) {
+    if (data.endpoints && data.endpoints.length > 0 && !data.endpoints[0].username) {
       try {
         const userResponse = await fetch(`${API_BASE_URL}/user/profile`, {
           headers: {
-            "Content-Type": "application/json",
-            "x-wallet-address": walletAddress,
+            'Content-Type': 'application/json',
+            'x-wallet-address': walletAddress,
           },
         });
         if (userResponse.ok) {
@@ -225,42 +196,40 @@ export const endpointsApi = {
           }));
         }
       } catch (error) {
-        console.error("Failed to fetch username for endpoints:", error);
+        console.error('Failed to fetch username for endpoints:', error);
       }
     }
 
     return data;
   },
 
-  async createEndpoint(
-    data: CreateEndpointData
-  ): Promise<{ message: string; endpoint: Endpoint }> {
+  async createEndpoint(data: CreateEndpointData): Promise<{ message: string; endpoint: Endpoint }> {
     const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/endpoints`, {
-      method: "POST",
+      method: 'POST',
       headers,
       body: JSON.stringify(data),
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Failed to create endpoint");
+      throw new Error(error.error || 'Failed to create endpoint');
     }
     return response.json();
   },
 
   async updateEndpoint(
     id: string,
-    data: UpdateEndpointData
+    data: UpdateEndpointData,
   ): Promise<{ message: string; endpoint: Endpoint }> {
     const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/endpoints/${id}`, {
-      method: "PUT",
+      method: 'PUT',
       headers,
       body: JSON.stringify(data),
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Failed to update endpoint");
+      throw new Error(error.error || 'Failed to update endpoint');
     }
     return response.json();
   },
@@ -268,12 +237,12 @@ export const endpointsApi = {
   async deleteEndpoint(id: string): Promise<{ message: string }> {
     const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/endpoints/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers,
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Failed to delete endpoint");
+      throw new Error(error.error || 'Failed to delete endpoint');
     }
     return response.json();
   },
@@ -283,25 +252,23 @@ export const userApi = {
   async getProfile(): Promise<User> {
     const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/user/profile`, {
-      method: "GET",
+      method: 'GET',
       headers,
     });
-    if (!response.ok) throw new Error("Failed to fetch profile");
+    if (!response.ok) throw new Error('Failed to fetch profile');
     return response.json();
   },
 
-  async updateProfile(
-    username: string
-  ): Promise<{ message: string; user: User }> {
+  async updateProfile(username: string): Promise<{ message: string; user: User }> {
     const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/user/profile`, {
-      method: "PUT",
+      method: 'PUT',
       headers,
       body: JSON.stringify({ username }),
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Failed to update profile");
+      throw new Error(error.error || 'Failed to update profile');
     }
     return response.json();
   },
@@ -327,7 +294,7 @@ export function buildMcpUrl(username: string): string {
 // Helper function for fetching JSON
 export async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${url}`);
-  if (!response.ok) throw new Error("Failed to fetch");
+  if (!response.ok) throw new Error('Failed to fetch');
   return response.json();
 }
 
@@ -343,13 +310,13 @@ export async function getMyEndpoints(walletAddress: string): Promise<{
 }
 
 export async function createEndpoint(
-  data: CreateEndpointData
+  data: CreateEndpointData,
 ): Promise<{ message: string; endpoint: Endpoint }> {
   return endpointsApi.createEndpoint(data);
 }
 
 export async function updateEndpoint(
-  data: UpdateEndpointData & { id: string }
+  data: UpdateEndpointData & { id: string },
 ): Promise<{ message: string; endpoint: Endpoint }> {
   const { id, ...updateData } = data;
   return endpointsApi.updateEndpoint(id, updateData);
@@ -364,8 +331,6 @@ export async function getCurrentUser(): Promise<User> {
   return userApi.getProfile();
 }
 
-export async function updateUsername(
-  username: string
-): Promise<{ message: string; user: User }> {
+export async function updateUsername(username: string): Promise<{ message: string; user: User }> {
   return userApi.updateProfile(username);
 }

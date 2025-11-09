@@ -1,11 +1,11 @@
-import cors from "cors";
-import * as dotenv from "dotenv";
-import express, { NextFunction, Request, Response } from "express";
-import authRouter from "./routes/auth";
-import endpointsRouter from "./routes/endpoints";
-import mcpRouter from "./routes/mcp";
-import proxyRouter from "./routes/proxy";
-import userRouter from "./routes/user";
+import cors from 'cors';
+import * as dotenv from 'dotenv';
+import express, { NextFunction, Request, Response } from 'express';
+import authRouter from './routes/auth';
+import endpointsRouter from './routes/endpoints';
+import mcpRouter from './routes/mcp';
+import proxyRouter from './routes/proxy';
+import userRouter from './routes/user';
 
 dotenv.config();
 
@@ -20,48 +20,48 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.get("/health", (req: Request, res: Response) => {
+app.get('/health', (req: Request, res: Response) => {
   res.json({
-    status: "ok",
+    status: 'ok',
     timestamp: new Date().toISOString(),
   });
 });
 
-app.use("/auth", authRouter);
+app.use('/auth', authRouter);
 
-app.use("/endpoints", endpointsRouter);
+app.use('/endpoints', endpointsRouter);
 
-app.use("/user", userRouter);
+app.use('/user', userRouter);
 
-app.use("/mcp", mcpRouter);
+app.use('/mcp', mcpRouter);
 
-app.use("/", proxyRouter);
+app.use('/', proxyRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({
-    error: "Not found",
+    error: 'Not found',
     message: `Route ${req.method} ${req.path} not found`,
   });
 });
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error("Error:", err);
+  console.error('Error:', err);
 
   if (res.headersSent) {
     return next(err);
   }
 
   const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal server error";
+  const message = err.message || 'Internal server error';
 
   res.status(status).json({
     error: message,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`JWT Authentication: ENABLED`);
 });
