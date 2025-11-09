@@ -39,6 +39,7 @@ export default function MyEndpointsPage() {
   const [editingEndpoint, setEditingEndpoint] = useState<Endpoint | undefined>();
   const [deletingEndpoint, setDeletingEndpoint] = useState<Endpoint | null>(null);
   const [username, setUsername] = useState("");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     if (!currentUser) {
@@ -106,14 +107,18 @@ export default function MyEndpointsPage() {
     }
   };
 
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   if (!currentUser) {
     return null;
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <DashboardHeader />
-      <Sidebar />
+      <DashboardHeader onToggleSidebar={toggleSidebar} />
+      <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
       <main className="flex-1 pt-24 pb-12 px-4 ml-64 transition-all duration-300">
         <div className="container mx-auto max-w-7xl">
           <div className="space-y-8">

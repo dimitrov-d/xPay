@@ -136,27 +136,29 @@ export default function DashboardPage() {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <div className="space-y-8">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-4xl font-bold">Endpoint Marketplace</h1>
+            <h1 className="text-4xl font-bold">xPay Endpoint Marketplace</h1>
             <p className="text-muted-foreground mt-2">
               Browse and discover x402-protected API endpoints
             </p>
           </div>
-          <Button onClick={() => setAddModalOpen(true)} size="lg" variant="hero">
-            <Plus className="w-5 h-5 mr-2" />
-            Add New Endpoint
-          </Button>
+          <div className="mr-8">
+            <Button onClick={() => setAddModalOpen(true)} size="lg" variant="hero">
+              <Plus className="w-5 h-5 mr-2" />
+              Add New Endpoint
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
+          <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               placeholder="Search endpoints..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 w-80"
             />
           </div>
 

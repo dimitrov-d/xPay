@@ -5,7 +5,7 @@ import { useCurrentUser } from "@coinbase/cdp-hooks";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { User } from "lucide-react";
+import { User, Menu } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const DashboardHeader = () => {
+interface DashboardHeaderProps {
+  onToggleSidebar?: () => void;
+}
+
+export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const { currentUser } = useCurrentUser();
@@ -22,19 +26,31 @@ export const DashboardHeader = () => {
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between h-16">
-          <Link
-            href="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
-          >
-            <Image
-              src="/logo.png"
-              alt="xPay"
-              width={64}
-              height={64}
-              className="w-16 h-16"
-            />
-            <span className="text-2xl font-bold">xPAY</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            {currentUser && onToggleSidebar && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggleSidebar}
+                className="w-10 h-10"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            )}
+            <Link
+              href="/"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <Image
+                src="/logo.png"
+                alt="xPay"
+                width={64}
+                height={64}
+                className="w-16 h-16"
+              />
+              <span className="text-2xl font-bold">xPAY</span>
+            </Link>
+          </div>
 
           {currentUser && (
             <div className="flex items-center gap-4">
@@ -43,9 +59,11 @@ export const DashboardHeader = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full w-10 h-10 hover:bg-transparent"
+                    className="rounded-full w-10 h-10 bg-accent/10"
                   >
-                    <User className="w-5 h-5" />
+                    <div className="rounded-full bg-accent p-2">
+                      <User className="w-5 h-5 text-accent-foreground" />
+                    </div>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">

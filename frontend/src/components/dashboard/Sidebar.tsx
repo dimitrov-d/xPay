@@ -2,13 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@coinbase/cdp-hooks";
-import { ChevronLeft, ChevronRight, LayoutDashboard, List, Wallet, Settings } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutDashboard, List, Wallet, Home } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
-export const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+}
+
+export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
   const pathname = usePathname();
   const { currentUser } = useCurrentUser();
 
@@ -41,11 +45,6 @@ export const Sidebar = () => {
       name: "Wallet & Profile",
       href: "/wallet",
       icon: Wallet,
-    },
-    {
-      name: "Settings",
-      href: "/dashboard/settings",
-      icon: Settings,
     },
   ];
 
@@ -82,11 +81,21 @@ export const Sidebar = () => {
           </nav>
         </div>
 
-        <div className="p-2 border-t border-border">
+        <div className="p-2 border-t border-border space-y-2">
+          <Link href="/">
+            <div
+              className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors hover:bg-secondary text-muted-foreground hover:text-foreground"
+            >
+              <Home className="w-5 h-5 shrink-0" />
+              {!collapsed && (
+                <span className="text-sm font-medium">Back to Home</span>
+              )}
+            </div>
+          </Link>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={onToggle}
             className="w-full"
           >
             {collapsed ? (
