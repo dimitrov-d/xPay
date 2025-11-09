@@ -77,9 +77,9 @@ export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
               <Image
                 src="/logo.png"
                 alt="xPay"
-                width={64}
-                height={64}
-                className="w-16 h-16"
+                width={72}
+                height={72}
+                className="w-20 h-20"
               />
               <span className="text-2xl font-bold">xPAY</span>
             </Link>

@@ -1,13 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { isAuthenticated } from "@/lib/auth";
 import { useCurrentUser } from "@coinbase/cdp-hooks";
 import { SignInModal, SignInModalContent } from "@coinbase/cdp-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { isAuthenticated } from "@/lib/auth";
 
 export const Header = () => {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
@@ -40,7 +40,7 @@ export const Header = () => {
               href={currentUser ? "/dashboard" : "/"}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
             >
-              <Image src="/logo.png" alt="xPay" width={64} height={64} className="w-16 h-16" />
+              <Image src="/logo.png" alt="xPay" width={72} height={72} className="w-20 h-20" />
               <span className="text-2xl font-bold">xPAY</span>
             </Link>
 
