@@ -58,9 +58,12 @@ export function EndpointDetailsDialog({
   const mcpUrl = buildMcpUrl(username);
 
   return (
+    // @ts-expect-error - React 18/19 type compatibility issue with Next.js 15
     <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* @ts-expect-error - React 18/19 type compatibility issue */}
       <DialogContent className="max-w-2xl">
         <DialogHeader>
+          {/* @ts-expect-error - React 18/19 type compatibility issue */}
           <DialogTitle className="flex items-center justify-between gap-3">
             <span>{name}</span>
             <Badge className={getMethodColor(httpMethod)}>{httpMethod}</Badge>

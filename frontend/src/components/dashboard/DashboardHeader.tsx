@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@coinbase/cdp-hooks";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { User, Menu } from "lucide-react";
 import {
   DropdownMenu,
@@ -19,12 +19,11 @@ interface DashboardHeaderProps {
 
 export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
   const router = useRouter();
-  const pathname = usePathname();
   const { currentUser } = useCurrentUser();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto max-w-7xl px-4">
+      <div className="w-full px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             {currentUser && onToggleSidebar && (
