@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { isAuthenticated } from "@/lib/auth";
 
 export const Header = () => {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
@@ -16,12 +17,18 @@ export const Header = () => {
   const isHomePage = pathname === "/";
 
   const handleSignInSuccess = () => {
-    router.push("/dashboard");
+    // Don't redirect immediately - let the SignatureModal handle authentication flow
+    // The modal will appear automatically via useRequireAuth hook on the home page
+    setIsSignInOpen(false);
   };
 
   const handleGetStartedClick = () => {
-    if (currentUser) router.push("/dashboard");
-    else setIsSignInOpen(true);
+    // Only redirect if user is fully authenticated (has JWT token)
+    if (currentUser && isAuthenticated()) {
+      router.push("/dashboard");
+    } else {
+      setIsSignInOpen(true);
+    }
   };
 
   return (

@@ -18,15 +18,20 @@ export function useRequireAuth() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // If user has wallet connected but no JWT, show modal
+    // If user has wallet connected but no JWT, show modal immediately
     if (currentUser && solanaAddress && !isAuthenticated()) {
-      setShowSignatureModal(true);
-      setIsReady(false);
+      // Small delay to ensure Coinbase modal is fully closed first
+      const timer = setTimeout(() => {
+        setShowSignatureModal(true);
+        setIsReady(false);
+      }, 300);
+      return () => clearTimeout(timer);
     } else if (isAuthenticated() && solanaAddress) {
       setShowSignatureModal(false);
       setIsReady(true);
     } else {
       setIsReady(false);
+      setShowSignatureModal(false);
     }
   }, [currentUser, solanaAddress]);
 

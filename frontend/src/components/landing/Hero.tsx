@@ -6,6 +6,7 @@ import { SignInModal, SignInModalContent } from "@coinbase/cdp-react";
 import { ArrowRight, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { isAuthenticated } from "@/lib/auth";
 
 export const Hero = () => {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
@@ -13,12 +14,17 @@ export const Hero = () => {
   const { currentUser } = useCurrentUser();
 
   const handleSignInSuccess = () => {
-    router.push("/dashboard");
+    // Don't redirect immediately - let the SignatureModal handle authentication flow
+    setIsSignInOpen(false);
   };
 
   const handleGetStartedClick = () => {
-    if (currentUser) router.push("/dashboard");
-    else setIsSignInOpen(true);
+    // Only redirect if user is fully authenticated (has JWT token)
+    if (currentUser && isAuthenticated()) {
+      router.push("/dashboard");
+    } else {
+      setIsSignInOpen(true);
+    }
   };
 
   return (
