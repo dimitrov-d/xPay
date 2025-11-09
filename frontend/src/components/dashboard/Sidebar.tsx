@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, LayoutDashboard, List, Wallet, Home } from "
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -92,6 +93,11 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
               )}
             </div>
           </Link>
+          
+          {!collapsed && (
+            <LogoutButton variant="ghost" size="sm" className="w-full justify-start" />
+          )}
+          
           <Button
             variant="ghost"
             size="icon"

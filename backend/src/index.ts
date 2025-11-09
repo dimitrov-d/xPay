@@ -1,6 +1,7 @@
 import cors from "cors";
 import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
+import authRouter from "./routes/auth";
 import endpointsRouter from "./routes/endpoints";
 import mcpRouter from "./routes/mcp";
 import proxyRouter from "./routes/proxy";
@@ -25,6 +26,8 @@ app.get("/health", (req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use("/auth", authRouter);
 
 app.use("/endpoints", endpointsRouter);
 
@@ -60,9 +63,5 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(
-    `Auth bypass: ${
-      process.env.BYPASS_AUTH === "true" ? "ENABLED" : "DISABLED"
-    }`
-  );
+  console.log(`JWT Authentication: ENABLED`);
 });

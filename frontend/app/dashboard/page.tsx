@@ -35,21 +35,24 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!solanaAddress || !currentUser) return;
-
       try {
-        const signMessage = async (message: string) => {
-          return "signature";
-        };
+        // Check for JWT authentication
+        const { isAuthenticated } = await import("@/lib/auth");
+        
+        if (!isAuthenticated()) {
+          return; // Don't fetch if not authenticated
+        }
 
-        const profile = await userApi.getProfile(solanaAddress, signMessage);
+        const profile = await userApi.getProfile();
         setUsername(profile.username);
       } catch (error) {
         console.error("Failed to fetch profile:", error);
       }
     };
 
-    fetchProfile();
+    if (currentUser && solanaAddress) {
+      fetchProfile();
+    }
   }, [solanaAddress, currentUser]);
 
   useEffect(() => {
@@ -116,11 +119,7 @@ export default function DashboardPage() {
     }
 
     try {
-      const signMessage = async (message: string) => {
-        return "signature";
-      };
-
-      const result = await endpointsApi.createEndpoint(data, solanaAddress, signMessage);
+      const result = await endpointsApi.createEndpoint(data);
       toast.success("Endpoint created successfully!");
 
       const updatedData = await endpointsApi.getAllEndpoints(1, 100);

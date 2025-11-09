@@ -9,10 +9,7 @@ import { Response, Router } from "express";
 import { db } from "../config/database";
 import { users } from "../db/schema";
 import { updateUserSchema, type UpdateUserDto } from "../dto/user.dto";
-import {
-  AuthenticatedRequest,
-  verifyWalletSignature,
-} from "../middleware/auth";
+import { AuthenticatedRequest, verifyAuth } from "../middleware/auth";
 import { validateBody } from "../middleware/validation";
 
 const getRpcUrl = () =>
@@ -26,7 +23,7 @@ const router = Router();
  */
 router.get(
   "/profile",
-  verifyWalletSignature,
+  verifyAuth,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const walletAddress = req.walletAddress!;
@@ -34,7 +31,7 @@ router.get(
       const [user] = await db
         .select()
         .from(users)
-        // .where(eq(users.walletAddress, walletAddress))
+        .where(eq(users.walletAddress, walletAddress))
         .limit(1);
 
       if (!user) {
@@ -99,7 +96,7 @@ router.get(
  */
 router.put(
   "/profile",
-  verifyWalletSignature,
+  verifyAuth,
   validateBody(updateUserSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {

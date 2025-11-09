@@ -1,3 +1,13 @@
+import {
+  AuthUser,
+  clearAuthToken,
+  getAuthHeaders,
+  getAuthToken,
+  LoginResponse,
+  setAuthToken,
+  setAuthUser,
+} from "./auth";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface Endpoint {
@@ -63,20 +73,97 @@ export interface UpdateEndpointData {
   sampleResponse?: any;
 }
 
-async function getAuthHeaders(
-  walletAddress: string,
-  signMessage: (message: string) => Promise<string>
-): Promise<Record<string, string>> {
-  const message = `Authenticate with xPay - ${Date.now()}`;
-  const signature = await signMessage(message);
+/**
+ * Auth API
+ */
+export const authApi = {
+  /**
+   * Login with wallet signature
+   */
+  async login(
+    walletAddress: string,
+    message: string,
+    signature: string
+  ): Promise<LoginResponse> {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        walletAddress,
+        message,
+        signature,
+      }),
+    });
 
-  return {
-    "Content-Type": "application/json",
-    "x-wallet-address": walletAddress,
-    "x-message": message,
-    "x-signature": signature,
-  };
-}
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to login");
+    }
+
+    const data: LoginResponse = await response.json();
+
+    // Store token and user data
+    setAuthToken(data.token);
+    setAuthUser(data.user);
+
+    return data;
+  },
+
+  /**
+   * Logout and clear local storage
+   */
+  async logout(): Promise<void> {
+    const token = getAuthToken();
+
+    if (token) {
+      try {
+        await fetch(`${API_BASE_URL}/auth/logout`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      } catch (error) {
+        console.error("Logout request failed:", error);
+      }
+    }
+
+    // Always clear local storage
+    clearAuthToken();
+  },
+
+  /**
+   * Verify if current token is valid
+   */
+  async verifyToken(): Promise<{ valid: boolean; user?: AuthUser }> {
+    const token = getAuthToken();
+
+    if (!token) {
+      return { valid: false };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        clearAuthToken();
+        return { valid: false };
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      clearAuthToken();
+      return { valid: false };
+    }
+  },
+};
 
 export const endpointsApi = {
   async getAllEndpoints(page = 1, limit = 20): Promise<PaginatedEndpoints> {
@@ -146,11 +233,9 @@ export const endpointsApi = {
   },
 
   async createEndpoint(
-    data: CreateEndpointData,
-    walletAddress: string,
-    signMessage: (message: string) => Promise<string>
+    data: CreateEndpointData
   ): Promise<{ message: string; endpoint: Endpoint }> {
-    const headers = await getAuthHeaders(walletAddress, signMessage);
+    const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/endpoints`, {
       method: "POST",
       headers,
@@ -165,11 +250,9 @@ export const endpointsApi = {
 
   async updateEndpoint(
     id: string,
-    data: UpdateEndpointData,
-    walletAddress: string,
-    signMessage: (message: string) => Promise<string>
+    data: UpdateEndpointData
   ): Promise<{ message: string; endpoint: Endpoint }> {
-    const headers = await getAuthHeaders(walletAddress, signMessage);
+    const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/endpoints/${id}`, {
       method: "PUT",
       headers,
@@ -182,12 +265,8 @@ export const endpointsApi = {
     return response.json();
   },
 
-  async deleteEndpoint(
-    id: string,
-    walletAddress: string,
-    signMessage: (message: string) => Promise<string>
-  ): Promise<{ message: string }> {
-    const headers = await getAuthHeaders(walletAddress, signMessage);
+  async deleteEndpoint(id: string): Promise<{ message: string }> {
+    const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/endpoints/${id}`, {
       method: "DELETE",
       headers,
@@ -201,11 +280,8 @@ export const endpointsApi = {
 };
 
 export const userApi = {
-  async getProfile(
-    walletAddress: string,
-    signMessage: (message: string) => Promise<string>
-  ): Promise<User> {
-    const headers = await getAuthHeaders(walletAddress, signMessage);
+  async getProfile(): Promise<User> {
+    const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/user/profile`, {
       method: "GET",
       headers,
@@ -215,11 +291,9 @@ export const userApi = {
   },
 
   async updateProfile(
-    username: string,
-    walletAddress: string,
-    signMessage: (message: string) => Promise<string>
+    username: string
   ): Promise<{ message: string; user: User }> {
-    const headers = await getAuthHeaders(walletAddress, signMessage);
+    const headers = getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/user/profile`, {
       method: "PUT",
       headers,
@@ -271,63 +345,29 @@ export async function getMyEndpoints(walletAddress: string): Promise<{
 }
 
 export async function createEndpoint(
-  data: CreateEndpointData,
-  walletAddress: string
+  data: CreateEndpointData
 ): Promise<{ message: string; endpoint: Endpoint }> {
-  const signMessage = async (message: string) => "signature";
-  return endpointsApi.createEndpoint(data, walletAddress, signMessage);
+  return endpointsApi.createEndpoint(data);
 }
 
 export async function updateEndpoint(
-  data: UpdateEndpointData & { id: string },
-  walletAddress: string
+  data: UpdateEndpointData & { id: string }
 ): Promise<{ message: string; endpoint: Endpoint }> {
-  const signMessage = async (message: string) => "signature";
   const { id, ...updateData } = data;
-  return endpointsApi.updateEndpoint(
-    id,
-    updateData,
-    walletAddress,
-    signMessage
-  );
+  return endpointsApi.updateEndpoint(id, updateData);
 }
 
-export async function deleteEndpoint(
-  id: string,
-  walletAddress: string
-): Promise<{ message: string }> {
-  const signMessage = async (message: string) => "signature";
-  return endpointsApi.deleteEndpoint(id, walletAddress, signMessage);
+export async function deleteEndpoint(id: string): Promise<{ message: string }> {
+  return endpointsApi.deleteEndpoint(id);
 }
 
 // Helper functions for wallet page
-export async function getCurrentUser(walletAddress: string): Promise<User> {
-  const response = await fetch(`${API_BASE_URL}/user/profile`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "x-wallet-address": walletAddress,
-    },
-  });
-  if (!response.ok) throw new Error("Failed to fetch user");
-  return response.json();
+export async function getCurrentUser(): Promise<User> {
+  return userApi.getProfile();
 }
 
 export async function updateUsername(
-  username: string,
-  walletAddress: string
+  username: string
 ): Promise<{ message: string; user: User }> {
-  const response = await fetch(`${API_BASE_URL}/user/profile`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "x-wallet-address": walletAddress,
-    },
-    body: JSON.stringify({ username }),
-  });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Failed to update username");
-  }
-  return response.json();
+  return userApi.updateProfile(username);
 }

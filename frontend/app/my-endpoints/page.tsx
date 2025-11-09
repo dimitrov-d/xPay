@@ -16,7 +16,6 @@ import {
   type UpdateEndpointData,
 } from "@/lib/api";
 import { Loader2 } from "lucide-react";
-import { Footer } from "@/components/landing/Footer";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -28,11 +27,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 
 export default function MyEndpointsPage() {
   const router = useRouter();
   const { currentUser } = useCurrentUser();
   const { solanaAddress } = useSolanaAddress();
+  const { isReady, SignatureModal } = useRequireAuth();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -47,8 +48,10 @@ export default function MyEndpointsPage() {
       return;
     }
 
-    loadEndpoints();
-  }, [currentUser, router, solanaAddress]);
+    if (isReady && solanaAddress) {
+      loadEndpoints();
+    }
+  }, [currentUser, router, solanaAddress, isReady]);
 
   const loadEndpoints = async () => {
     if (!solanaAddress) return;
@@ -77,10 +80,10 @@ export default function MyEndpointsPage() {
   };
 
   const confirmDelete = async () => {
-    if (!deletingEndpoint || !solanaAddress) return;
+    if (!deletingEndpoint) return;
 
     try {
-      await deleteEndpoint(deletingEndpoint.id, solanaAddress);
+      await deleteEndpoint(deletingEndpoint.id);
       toast.success("Endpoint deleted successfully");
       await loadEndpoints();
       setDeletingEndpoint(null);
@@ -90,13 +93,8 @@ export default function MyEndpointsPage() {
   };
 
   const handleUpdateEndpoint = async (data: UpdateEndpointData) => {
-    if (!solanaAddress) {
-      toast.error("Wallet not connected");
-      return;
-    }
-
     try {
-      await updateEndpoint(data, solanaAddress);
+      await updateEndpoint(data);
       toast.success("Endpoint updated successfully");
       await loadEndpoints();
       setShowAddModal(false);
@@ -115,11 +113,25 @@ export default function MyEndpointsPage() {
     return null;
   }
 
+  // Don't render page content until authenticated
+  if (!isReady) {
+    return (
+      <>
+        {SignatureModal}
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+        </div>
+      </>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <DashboardHeader onToggleSidebar={toggleSidebar} />
-      <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
-      <main className="flex-1 pt-24 pb-12 px-4 ml-64 transition-all duration-300">
+    <>
+      {SignatureModal}
+      <div className="min-h-screen flex flex-col">
+        <DashboardHeader onToggleSidebar={toggleSidebar} />
+        <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+        <main className="flex-1 pt-24 pb-12 px-4 ml-64 transition-all duration-300">
         <div className="container mx-auto max-w-7xl">
           <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -168,7 +180,6 @@ export default function MyEndpointsPage() {
           </div>
         </div>
       </main>
-      <Footer />
 
       {showAddModal && (
         <EndpointFormModal
@@ -178,13 +189,9 @@ export default function MyEndpointsPage() {
             if (!open) setEditingEndpoint(undefined);
           }}
           onSubmit={editingEndpoint ? handleUpdateEndpoint : async (data) => {
-            if (!solanaAddress) {
-              toast.error("Wallet not connected");
-              return;
-            }
             try {
               const { createEndpoint } = await import("@/lib/api");
-              await createEndpoint(data, solanaAddress);
+              await createEndpoint(data);
               toast.success("Endpoint created successfully");
               await loadEndpoints();
               setShowAddModal(false);
@@ -219,7 +226,8 @@ export default function MyEndpointsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </>
   );
 }
 

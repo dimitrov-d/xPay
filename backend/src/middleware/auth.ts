@@ -1,46 +1,44 @@
 import { NextFunction, Request, Response } from "express";
-import { verifySolanaSignature } from "../utils/solana";
+import { JWTPayload, verifyToken } from "../utils/jwt";
 
 export interface AuthenticatedRequest extends Request {
   walletAddress?: string;
+  username?: string;
+  user?: JWTPayload;
 }
 
 /**
- * Middleware to verify Solana wallet signature
- * Can be bypassed with BYPASS_AUTH environment variable for local testing
+ * Middleware to verify JWT token from Authorization header
+ * Extracts user information from token and attaches to request
  */
-export function verifyWalletSignature(
+export function verifyAuth(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) {
-  if (process.env.BYPASS_AUTH === "true") {
-    req.walletAddress =
-      (req.headers["x-wallet-address"] as string) ||
-      (req.body?.walletAddress as string) ||
-      "test-wallet-address";
-    return next();
-  }
+  const authHeader = req.headers.authorization;
 
-  const walletAddress = req.headers["x-wallet-address"] as string;
-  const message = req.headers["x-message"] as string;
-  const signature = req.headers["x-signature"] as string;
-
-  if (!walletAddress || !message || !signature) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
-      error: "Missing authentication headers",
-      required: ["x-wallet-address", "x-message", "x-signature"],
+      error: "Missing authentication token",
+      message: "Please provide a valid JWT token in Authorization header",
     });
   }
 
-  const isValid = verifySolanaSignature(walletAddress, message, signature);
+  const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+  const decoded = verifyToken(token);
 
-  if (!isValid) {
+  if (!decoded) {
     return res.status(401).json({
-      error: "Invalid signature",
+      error: "Invalid or expired token",
+      message: "Please login again to get a new token",
     });
   }
 
-  req.walletAddress = walletAddress;
+  // Attach user information to request
+  req.walletAddress = decoded.walletAddress;
+  req.username = decoded.username;
+  req.user = decoded;
+
   next();
 }

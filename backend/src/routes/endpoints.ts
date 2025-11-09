@@ -13,10 +13,7 @@ import {
   type ListEndpointsQueryDto,
   type UpdateEndpointDto,
 } from "../dto/endpoints.dto";
-import {
-  AuthenticatedRequest,
-  verifyWalletSignature,
-} from "../middleware/auth";
+import { AuthenticatedRequest, verifyAuth } from "../middleware/auth";
 import {
   validateBody,
   validateParams,
@@ -71,7 +68,7 @@ router.get(
  */
 router.post(
   "/",
-  verifyWalletSignature,
+  verifyAuth,
   validateBody(createEndpointSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
@@ -242,7 +239,7 @@ router.get(
  */
 router.put(
   "/:id",
-  verifyWalletSignature,
+  verifyAuth,
   validateParams(getEndpointParamsSchema),
   validateBody(updateEndpointSchema),
   async (req: AuthenticatedRequest, res: Response) => {
@@ -315,7 +312,7 @@ router.put(
  */
 router.delete(
   "/:id",
-  verifyWalletSignature,
+  verifyAuth,
   validateParams(deleteEndpointParamsSchema),
   async (req: AuthenticatedRequest, res: Response) => {
     try {

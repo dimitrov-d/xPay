@@ -13,11 +13,11 @@ export const CTA = () => {
   const { currentUser } = useCurrentUser();
 
   const handleSignInSuccess = () => {
-    router.push("/wallet");
+    router.push("/dashboard");
   };
 
   const handleGetStartedClick = () => {
-    if (currentUser) router.push("/wallet");
+    if (currentUser) router.push("/dashboard");
     else setIsSignInOpen(true);
   };
 
