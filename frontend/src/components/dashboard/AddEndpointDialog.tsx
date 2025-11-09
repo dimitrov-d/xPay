@@ -98,12 +98,9 @@ export function AddEndpointDialog({ onCreated }: { onCreated?: () => void }) {
   return (
     <>
       <Button onClick={() => setOpen(true)}>Add New Endpoint</Button>
-      {/* @ts-expect-error - React 18/19 type compatibility issue with Next.js 15 */}
       <Dialog open={open} onOpenChange={setOpen}>
-        {/* @ts-expect-error - React 18/19 type compatibility issue */}
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            {/* @ts-expect-error - React 18/19 type compatibility issue */}
             <DialogTitle>Add New Endpoint</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">

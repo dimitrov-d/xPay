@@ -1,5 +1,7 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,12 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Endpoint, getProxyUrl, getMcpServerUrl } from "@/lib/api";
-import { JsonViewer } from "./JsonViewer";
+import { Endpoint, getMcpUrl, getProxyUrl } from "@/lib/api";
 import { Copy } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { JsonViewer } from "./JsonViewer";
 
 interface EndpointDetailModalProps {
   endpoint: Endpoint;
@@ -26,8 +26,8 @@ export function EndpointDetailModal({
   onOpenChange,
 }: EndpointDetailModalProps) {
   const [copied, setCopied] = useState<string | null>(null);
-  const proxyUrl = getProxyUrl(endpoint);
-  const mcpUrl = getMcpServerUrl(endpoint.username);
+  const proxyUrl = getProxyUrl(endpoint.username, endpoint.name);
+  const mcpUrl = getMcpUrl(endpoint.username);
 
   const handleCopy = async (text: string, type: string) => {
     await navigator.clipboard.writeText(text);

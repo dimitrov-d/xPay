@@ -332,9 +332,7 @@ export async function fetchJson<T>(url: string): Promise<T> {
 }
 
 // Extended endpoint detail type
-export interface EndpointDetail extends Endpoint {
-  // Any additional fields that might be in the detailed response
-}
+export type EndpointDetail = Endpoint;
 
 // Helper functions for my-endpoints page
 export async function getMyEndpoints(walletAddress: string): Promise<{

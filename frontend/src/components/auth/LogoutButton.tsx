@@ -62,7 +62,7 @@ export function LogoutButton({
       className={className}
     >
       {showIcon && <LogOut className="mr-2 h-4 w-4" />}
-      {children || (isLoading ? "Logging out..." : "Logout")}
+      {children || (isLoading ? "Logging out..." : "Logout") as any}
     </Button>
   );
 }

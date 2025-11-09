@@ -20,6 +20,7 @@ import {
   deleteEndpoint,
   getMyEndpoints,
   updateEndpoint,
+  type CreateEndpointData,
   type Endpoint,
   type UpdateEndpointData,
 } from "@/lib/api";
@@ -92,7 +93,7 @@ export default function MyEndpointsPage() {
     }
   };
 
-  const handleUpdateEndpoint = async (data: UpdateEndpointData) => {
+  const handleUpdateEndpoint = async (data: UpdateEndpointData & { id: string }) => {
     try {
       await updateEndpoint(data);
       toast.success("Endpoint updated successfully");
@@ -171,9 +172,10 @@ export default function MyEndpointsPage() {
                     <EndpointCard
                       key={endpoint.id || `endpoint-${index}`}
                       endpoint={endpoint}
-                      showActions={true}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
+                      onViewDetails={(endpoint) => {
+                        setEditingEndpoint(endpoint);
+                        setShowAddModal(true);
+                      }}
                     />
                   ))}
                 </div>
@@ -192,7 +194,7 @@ export default function MyEndpointsPage() {
             onSubmit={editingEndpoint ? handleUpdateEndpoint : async (data) => {
               try {
                 const { createEndpoint } = await import("@/lib/api");
-                await createEndpoint(data);
+                await createEndpoint(data as CreateEndpointData);
                 toast.success("Endpoint created successfully");
                 await loadEndpoints();
                 setShowAddModal(false);

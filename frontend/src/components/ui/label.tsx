@@ -11,12 +11,13 @@ const labelVariants = cva(
 )
 
 const Label = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &
+  React.ElementRef<any>,
+  React.ComponentPropsWithoutRef<any> &
   VariantProps<typeof labelVariants>
 >(({ className, ...props }, ref) => (
+  // @ts-expect-error - React 18/19 type compatibility issue
   <LabelPrimitive.Root
-    ref={ref}
+    ref={ref as any}
     className={cn(labelVariants(), className)}
     {...props}
   />

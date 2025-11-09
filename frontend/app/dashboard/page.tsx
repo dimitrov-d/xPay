@@ -38,7 +38,7 @@ export default function DashboardPage() {
       try {
         // Check for JWT authentication
         const { isAuthenticated } = await import("@/lib/auth");
-        
+
         if (!isAuthenticated()) {
           return; // Don't fetch if not authenticated
         }

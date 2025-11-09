@@ -269,7 +269,6 @@ export default function WalletPage() {
                   ) : (
                     <>
                       <div className="space-y-2">
-                        {/* @ts-expect-error - React 18/19 type compatibility issue with Radix UI Label */}
                         <Label htmlFor="username">Username</Label>
                         <Input
                           id="username"
@@ -320,17 +319,13 @@ export default function WalletPage() {
           </div>
         </main>
 
-        {/* @ts-expect-error - React 18/19 type compatibility issue with Next.js 15 */}
         <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
-          {/* @ts-expect-error - React 18/19 type compatibility issue */}
           <AlertDialogContent>
             <AlertDialogHeader>
-              {/* @ts-expect-error - React 18/19 type compatibility issue */}
               <AlertDialogTitle className="flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-yellow-500" />
                 Username Change Warning
               </AlertDialogTitle>
-              {/* @ts-expect-error - React 18/19 type compatibility issue */}
               <AlertDialogDescription className="space-y-2">
                 <p>
                   Changing your username is <strong>not backwards compatible</strong>.
@@ -362,9 +357,7 @@ export default function WalletPage() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              {/* @ts-expect-error - React 18/19 type compatibility issue */}
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              {/* @ts-expect-error - React 18/19 type compatibility issue */}
               <AlertDialogAction onClick={confirmUsernameChange} className="bg-yellow-500 hover:bg-yellow-600">
                 I Understand, Change Username
               </AlertDialogAction>

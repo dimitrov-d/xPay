@@ -40,7 +40,7 @@ export function EndpointFormModal({
 }: EndpointFormModalProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CreateEndpointData>({
-    username: username,
+    username,
     name: "",
     description: "",
     originalUrl: "",
@@ -68,7 +68,7 @@ export function EndpointFormModal({
       });
     } else {
       setFormData({
-        username: username,
+        username,
         name: "",
         description: "",
         originalUrl: "",
@@ -87,7 +87,7 @@ export function EndpointFormModal({
     setLoading(true);
     try {
       if (endpoint) {
-        await onSubmit({ ...formData, id: endpoint.id });
+        await onSubmit({ ...formData });
       } else {
         await onSubmit(formData);
       }

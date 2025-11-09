@@ -1,12 +1,12 @@
 "use client";
 
+import { LogoutButton } from "@/components/auth/LogoutButton";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@coinbase/cdp-hooks";
-import { ChevronLeft, ChevronRight, LayoutDashboard, List, Wallet, Home } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, LayoutDashboard, List, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { useEffect } from "react";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -21,11 +21,7 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
     // Update body padding when sidebar collapses
     const mainElement = document.querySelector('main');
     if (mainElement) {
-      if (collapsed) {
-        mainElement.style.marginLeft = '4rem';
-      } else {
-        mainElement.style.marginLeft = '16rem';
-      }
+      mainElement.style.marginLeft = collapsed ? '4rem' : '16rem';
     }
   }, [collapsed]);
 
@@ -51,9 +47,8 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
 
   return (
     <aside
-      className={`fixed left-0 top-16 bottom-0 bg-card border-r border-border transition-all duration-300 z-40 ${
-        collapsed ? "w-16" : "w-64"
-      }`}
+      className={`fixed left-0 top-16 bottom-0 bg-card border-r border-border transition-all duration-300 z-40 ${collapsed ? "w-16" : "w-64"
+        }`}
     >
       <div className="flex flex-col h-full">
         <div className="flex-1 py-4">
@@ -61,15 +56,14 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-              
+
               return (
                 <Link key={item.href} href={item.href}>
                   <div
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                      isActive
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${isActive
                         ? "bg-accent text-accent-foreground"
                         : "hover:bg-secondary text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <Icon className="w-5 h-5 shrink-0" />
                     {!collapsed && (
@@ -93,11 +87,11 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
               )}
             </div>
           </Link>
-          
+
           {!collapsed && (
             <LogoutButton variant="ghost" size="sm" className="w-full justify-start" />
           )}
-          
+
           <Button
             variant="ghost"
             size="icon"

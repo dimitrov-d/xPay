@@ -109,10 +109,8 @@ export function EditEndpointDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* @ts-expect-error - React 18/19 type compatibility issue */}
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          {/* @ts-expect-error - React 18/19 type compatibility issue */}
           <DialogTitle>Edit Endpoint</DialogTitle>
         </DialogHeader>
         {isLoading && <div className="text-sm text-muted-foreground">Loading...</div>}
