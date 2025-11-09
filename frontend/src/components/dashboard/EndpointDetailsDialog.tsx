@@ -111,10 +111,6 @@ export function EndpointDetailsDialog({
               </div>
             </div>
             <div>
-              <div className="text-xs uppercase text-muted-foreground mb-1">Custom Auth Headers</div>
-              <JsonBlock value={data.customAuthHeaders} />
-            </div>
-            <div>
               <div className="text-xs uppercase text-muted-foreground mb-1">Sample Request Body</div>
               <JsonBlock value={data.sampleBody} />
             </div>

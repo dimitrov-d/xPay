@@ -117,13 +117,6 @@ export function EndpointDetailModal({
             </div>
           )}
 
-          {endpoint.customAuthHeaders && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold">Custom Auth Headers</h3>
-              <JsonViewer data={endpoint.customAuthHeaders} />
-            </div>
-          )}
-
           <div className="text-xs text-muted-foreground pt-4 border-t">
             Created: {new Date(endpoint.createdAt).toLocaleString()}
             {endpoint.updatedAt !== endpoint.createdAt && (

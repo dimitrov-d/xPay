@@ -175,11 +175,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
         }
       }
 
-      // Merge with custom auth headers if available
-      if (endpoint.customAuthHeaders) {
-        Object.assign(requestHeaders, endpoint.customAuthHeaders);
-      }
-
       // Parse body
       let requestBody: string | undefined;
       if (body.trim() && endpoint.httpMethod !== "GET") {
@@ -384,11 +379,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
                   className="font-mono text-xs"
                   rows={4}
                 />
-                {endpoint.customAuthHeaders && (
-                  <p className="text-xs text-muted-foreground">
-                    Note: Custom auth headers from endpoint configuration will be merged with these headers.
-                  </p>
-                )}
               </div>
             )}
           </div>

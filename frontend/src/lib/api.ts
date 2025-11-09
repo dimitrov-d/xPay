@@ -16,7 +16,8 @@ export interface Endpoint {
   username?: string;
   name: string;
   description: string;
-  originalUrl: string;
+  // Sensitive fields - only present in authenticated responses (create/update)
+  originalUrl?: string;
   httpMethod: string;
   paymentAmount: string;
   tokenType: string;

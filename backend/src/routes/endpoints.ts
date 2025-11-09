@@ -1,4 +1,4 @@
-import { and, count, eq } from 'drizzle-orm';
+import { and, count, eq, getTableColumns } from 'drizzle-orm';
 import { Response, Router } from 'express';
 import { db } from '../config/database';
 import { endpoints, users } from '../db/schema';
@@ -18,6 +18,10 @@ import { validateBody, validateParams, validateQuery } from '../middleware/valid
 
 const router = Router();
 
+// Exclude sensitive fields from public endpoint responses
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { originalUrl, customAuthHeaders, ...publicEndpointColumns } = getTableColumns(endpoints);
+
 /**
  * GET /endpoints
  * List all endpoints (public, for marketplace)
@@ -28,7 +32,10 @@ router.get('/', validateQuery(listEndpointsQuerySchema), async (req, res: Respon
     const offset = (page - 1) * limit;
 
     const allEndpoints = await db
-      .select()
+      .select({
+        ...publicEndpointColumns,
+        username: users.username,
+      })
       .from(endpoints)
       .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
       .limit(limit)
@@ -152,19 +159,8 @@ router.get('/:id', validateParams(getEndpointParamsSchema), async (req, res: Res
 
     const [endpoint] = await db
       .select({
-        id: endpoints.id,
+        ...publicEndpointColumns,
         username: users.username,
-        name: endpoints.name,
-        description: endpoints.description,
-        originalUrl: endpoints.originalUrl,
-        httpMethod: endpoints.httpMethod,
-        paymentAmount: endpoints.paymentAmount,
-        tokenType: endpoints.tokenType,
-        customAuthHeaders: endpoints.customAuthHeaders,
-        sampleBody: endpoints.sampleBody,
-        sampleResponse: endpoints.sampleResponse,
-        createdAt: endpoints.createdAt,
-        updatedAt: endpoints.updatedAt,
       })
       .from(endpoints)
       .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))

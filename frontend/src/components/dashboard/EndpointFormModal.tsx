@@ -58,7 +58,7 @@ export function EndpointFormModal({
         username: endpoint.username,
         name: endpoint.name,
         description: endpoint.description,
-        originalUrl: endpoint.originalUrl,
+        originalUrl: endpoint.originalUrl || "",
         httpMethod: endpoint.httpMethod as any,
         paymentAmount: parseFloat(endpoint.paymentAmount),
         tokenType: endpoint.tokenType,

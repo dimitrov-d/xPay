@@ -116,11 +116,10 @@ export function EndpointDetailsModal({
           </div>
 
           <Tabs defaultValue="urls" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="urls">URLs</TabsTrigger>
               <TabsTrigger value="sample-body">Sample Body</TabsTrigger>
               <TabsTrigger value="sample-response">Sample Response</TabsTrigger>
-              <TabsTrigger value="auth">Auth Headers</TabsTrigger>
             </TabsList>
 
             <TabsContent value="urls" className="space-y-4 mt-4">
@@ -154,13 +153,6 @@ export function EndpointDetailsModal({
               <JsonDisplay
                 data={endpoint.sampleResponse}
                 title="Sample Response"
-              />
-            </TabsContent>
-
-            <TabsContent value="auth" className="mt-4">
-              <JsonDisplay
-                data={endpoint.customAuthHeaders}
-                title="Custom Auth Headers"
               />
             </TabsContent>
           </Tabs>
