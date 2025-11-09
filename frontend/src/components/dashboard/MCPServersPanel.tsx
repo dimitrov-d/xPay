@@ -1,13 +1,13 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Endpoint, getMcpUrl } from "@/lib/api";
 import { Copy, Server } from "lucide-react";
 import { toast } from "sonner";
@@ -56,11 +56,13 @@ export function MCPServersPanel({ endpoints }: MCPServersPanelProps) {
       ) : (
         <Accordion type="single" collapsible className="space-y-4">
           {mcpServers.map((server) => (
+            // @ts-expect-error - AccordionItem is not typed
             <AccordionItem
               key={server.username}
               value={server.username}
               className="border rounded-lg bg-card shadow-elegant"
             >
+              {/* @ts-expect-error - AccordionTrigger is not typed */}
               <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
                 <div className="flex flex-col gap-3 w-full pr-4">
                   <div className="flex items-center justify-between w-full">
@@ -104,6 +106,7 @@ export function MCPServersPanel({ endpoints }: MCPServersPanelProps) {
                   </div>
                 </div>
               </AccordionTrigger>
+              {/* @ts-expect-error - AccordionContent is not typed */}
               <AccordionContent className="px-6 pb-6 pt-2">
                 <div className="space-y-4">
                   {/* Available Tools */}

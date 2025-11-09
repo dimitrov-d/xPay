@@ -30,17 +30,13 @@ export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      // Logout from backend (clears JWT token)
       await authApi.logout();
-
-      // Sign out from Coinbase CDP wallet session
       await signOut();
 
       toast.success("Logged out successfully", {
         description: "You have been signed out of your account and wallet",
       });
 
-      // Redirect to home page
       router.push("/");
     } catch (error: any) {
       console.error("Logout error:", error);

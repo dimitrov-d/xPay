@@ -76,7 +76,6 @@ export function AddEndpointModal({
     sampleResponse: null,
   });
 
-  // Get username from current user and initialize form data
   useEffect(() => {
     const user = getAuthUser();
     const currentUsername = user?.username || defaultUsername;
@@ -86,7 +85,6 @@ export function AddEndpointModal({
     }
 
     if (endpoint) {
-      // Edit mode - populate with endpoint data
       setFormData({
         username: endpoint.username || currentUsername,
         name: endpoint.name,
@@ -100,7 +98,6 @@ export function AddEndpointModal({
         sampleResponse: endpoint.sampleResponse || null,
       });
     } else {
-      // Create mode - reset to defaults
       setFormData({
         username: currentUsername,
         name: "",
@@ -121,7 +118,6 @@ export function AddEndpointModal({
     setLoading(true);
     try {
       if (endpoint) {
-        // Edit mode - submit update data with id
         const updateData: UpdateEndpointData & { id: string } = {
           id: endpoint.id,
           name: formData.name,
@@ -136,7 +132,6 @@ export function AddEndpointModal({
         };
         await onSubmit(updateData);
       } else {
-        // Create mode - submit full data with username
         await onSubmit(formData);
       }
       onOpenChange(false);

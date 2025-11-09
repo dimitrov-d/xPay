@@ -61,12 +61,10 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
   const [error, setError] = useState<string | null>(null);
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
 
-  // Form state
   const [queryParams, setQueryParams] = useState<string>("");
   const [headers, setHeaders] = useState<string>("");
   const [body, setBody] = useState<string>("");
 
-  // Collapsible state
   const [isEndpointDetailsOpen, setIsEndpointDetailsOpen] = useState<boolean>(true);
   const [isQueryBodyOpen, setIsQueryBodyOpen] = useState<boolean>(false);
   const [isHeadersOpen, setIsHeadersOpen] = useState<boolean>(false);
@@ -74,7 +72,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-  // Initialize body when modal opens or endpoint changes
   useEffect(() => {
     if (open && endpoint.sampleBody) {
       setBody(JSON.stringify(endpoint.sampleBody, null, 2));
@@ -100,22 +97,18 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
       const proxyUrl = getProxyUrl(endpoint.username || "", endpoint.name);
       const fullUrl = proxyUrl.startsWith("http") ? proxyUrl : `${API_BASE_URL}${proxyUrl}`;
 
-      // Step 1: Setup FareMeter payment handler with Coinbase CDP wallet
       setStep("signing");
 
       const network = "mainnet-beta";
       const connection = new Connection("https://api.mainnet-beta.solana.com", "confirmed");
 
-      // Lookup USDC mint address
       const usdcMint = new PublicKey(lookupKnownSPLToken(network, "USDC")!.address);
       const payerPublicKey = new PublicKey(solanaAddress);
 
-      // Create wallet interface that uses Coinbase CDP for signing
       const wallet = {
         network,
         publicKey: payerPublicKey,
         updateTransaction: async (tx: VersionedTransaction) => {
-          // Serialize and sign with Coinbase CDP
           const txBase64 = Buffer.from(tx.serialize()).toString("base64");
 
           const signResult = await signSolanaTransaction({
@@ -127,22 +120,18 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             throw new Error("Failed to sign transaction");
           }
 
-          // Deserialize the signed transaction
           const signedTxBytes = Buffer.from(signResult.signedTransaction, "base64");
           return VersionedTransaction.deserialize(signedTxBytes);
         },
       };
 
-      // Create payment handler and wrap fetch
       const handler = createPaymentHandler(wallet, usdcMint, connection);
       const fetchWithPayment = wrapFetch(fetch, {
         handlers: [handler],
       });
 
-      // Step 2: Make request - FareMeter handles 402 response and payment automatically
       setStep("executing");
 
-      // Parse query parameters (JSON format)
       let urlWithParams = fullUrl;
       if (queryParams.trim()) {
         try {
@@ -162,7 +151,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
         }
       }
 
-      // Parse headers (JSON format)
       const requestHeaders: Record<string, string> = {
         "Content-Type": "application/json",
       };
@@ -175,11 +163,9 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
         }
       }
 
-      // Parse body
       let requestBody: string | undefined;
       if (body.trim() && endpoint.httpMethod !== "GET") {
         try {
-          // Validate JSON
           JSON.parse(body);
           requestBody = body;
         } catch (err) {
@@ -195,8 +181,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
         ...(requestBody ? { body: requestBody } : {}),
       });
 
-      // Extract payment details from the payment handler if available
-      // The handler will have processed the 402 response
       if (response.status === 402) {
         const x402Data: X402Response = await response.json();
         if (x402Data.accepts && x402Data.accepts.length > 0) {
@@ -236,7 +220,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
     setResult(null);
     setError(null);
     setPaymentDetails(null);
-    // Reset form to defaults
     setQueryParams("");
     setHeaders("");
     setBody(endpoint.sampleBody ? JSON.stringify(endpoint.sampleBody, null, 2) : "");
@@ -255,7 +238,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Section 1: Endpoint Details + Wallet (expanded by default) */}
           <div className="rounded-lg border">
             <button
               type="button"
@@ -271,7 +253,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             </button>
             {isEndpointDetailsOpen && (
               <div className="px-4 pb-4 space-y-4">
-                {/* Endpoint Info - Three columns */}
                 <div className="grid grid-cols-3 gap-4 p-3 rounded-lg border bg-muted/50">
                   <div>
                     <Label className="text-xs text-muted-foreground">Endpoint URL</Label>
@@ -286,7 +267,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
                     <p className="text-sm mt-1 line-clamp-2">{endpoint.description}</p>
                   </div>
                 </div>
-                {/* Wallet Status */}
                 <div className="rounded-lg border p-4 bg-muted/50">
                   <div className="flex items-center gap-2">
                     <Wallet className="h-5 w-5 text-muted-foreground" />
@@ -306,7 +286,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             )}
           </div>
 
-          {/* Section 2: Query Parameters or Body (collapsed by default) */}
           <div className="rounded-lg border">
             <button
               type="button"
@@ -324,7 +303,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             </button>
             {isQueryBodyOpen && (
               <div className="px-4 pb-4 space-y-4">
-                {/* Query Parameters */}
                 <div className="space-y-2">
                   <Label htmlFor="query-params">Query Parameters (JSON)</Label>
                   <Textarea
@@ -337,7 +315,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
                   />
                 </div>
 
-                {/* Request Body */}
                 {endpoint.httpMethod !== "GET" && (
                   <div className="space-y-2">
                     <Label htmlFor="body">Request Body (JSON)</Label>
@@ -355,7 +332,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             )}
           </div>
 
-          {/* Section 3: Custom Headers (collapsed by default) */}
           <div className="rounded-lg border">
             <button
               type="button"
@@ -383,7 +359,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             )}
           </div>
 
-          {/* Section 4: Sample Response (collapsed by default) */}
           {endpoint.sampleResponse && (
             <div className="rounded-lg border">
               <button
@@ -408,7 +383,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             </div>
           )}
 
-          {/* Payment Details */}
           {paymentDetails && (
             <div className="rounded-lg border p-4 bg-blue-50 dark:bg-blue-950/20">
               <div className="flex items-start gap-2">
@@ -428,7 +402,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             </div>
           )}
 
-          {/* Status */}
           {step !== "idle" && (
             <div className="flex items-center gap-2 p-4 rounded-lg border">
               {step === "requesting" && (
@@ -468,7 +441,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             </div>
           )}
 
-          {/* Result */}
           {result && (
             <div className="space-y-2">
               <h3 className="text-sm font-semibold">Response:</h3>
@@ -476,7 +448,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             </div>
           )}
 
-          {/* Error */}
           {error && step === "error" && (
             <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-950/20 p-4">
               <div className="flex items-start gap-2">
@@ -489,7 +460,6 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             </div>
           )}
 
-          {/* Actions */}
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={handleClose} disabled={step === "requesting" || step === "signing" || step === "executing"}>
               {step === "idle" ? "Cancel" : "Close"}

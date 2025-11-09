@@ -15,6 +15,13 @@
       "when": 1762599057538,
       "tag": "0001_magenta_firebrand",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762719920701,
+      "tag": "0002_open_eternity",
+      "breakpoints": true
     }
   ]
 }

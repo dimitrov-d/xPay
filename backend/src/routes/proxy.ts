@@ -48,6 +48,30 @@ router.all('/:username/:endpointName', paywallMiddleware, async (req: Request, r
         customAuthHeaders: endpoint.customAuthHeaders as Record<string, string> | null,
       });
 
+      // Track earnings for successful responses (2xx status codes)
+      if (response.status >= 200 && response.status < 300) {
+        try {
+          const [fullEndpoint] = await db
+            .select()
+            .from(endpoints)
+            .where(eq(endpoints.id, endpoint.id))
+            .limit(1);
+
+          if (fullEndpoint) {
+            const currentEarnings = parseFloat(fullEndpoint.totalEarnings || '0');
+            const paymentAmount = parseFloat(fullEndpoint.paymentAmount || '0');
+            const newEarnings = (currentEarnings + paymentAmount).toString();
+
+            await db
+              .update(endpoints)
+              .set({ totalEarnings: newEarnings })
+              .where(eq(endpoints.id, endpoint.id));
+          }
+        } catch (earningsError) {
+          console.error('Error updating earnings:', earningsError);
+        }
+      }
+
       res.status(response.status);
 
       const headersToExclude = ['content-encoding', 'transfer-encoding', 'connection'];

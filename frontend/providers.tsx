@@ -20,6 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* @ts-expect-error - React 18/19 type compatibility issue */}
       <TooltipProvider>
         <Toaster />
         <Sonner />

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { SignatureModal } from "@/components/auth/SignatureModal";
+import { isAuthenticated } from "@/lib/auth";
 import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
-import { SignatureModal } from "@/components/auth/SignatureModal";
+import { useEffect, useState } from "react";
 
 /**
  * Hook that checks authentication and shows signature modal if needed
@@ -18,9 +18,7 @@ export function useRequireAuth() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // If user has wallet connected but no JWT, show modal immediately
     if (currentUser && solanaAddress && !isAuthenticated()) {
-      // Small delay to ensure Coinbase modal is fully closed first
       const timer = setTimeout(() => {
         setShowSignatureModal(true);
         setIsReady(false);
@@ -38,14 +36,13 @@ export function useRequireAuth() {
   const handleAuthSuccess = () => {
     setShowSignatureModal(false);
     setIsReady(true);
-    // Redirect to dashboard after successful authentication
     router.push("/dashboard");
   };
 
   const modal = (
     <SignatureModal
       open={showSignatureModal}
-      onOpenChange={() => {}} // Cannot be closed
+      onOpenChange={() => { }} // Cannot be closed
       onSuccess={handleAuthSuccess}
     />
   );

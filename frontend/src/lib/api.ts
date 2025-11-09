@@ -16,7 +16,6 @@ export interface Endpoint {
   username?: string;
   name: string;
   description: string;
-  // Sensitive fields - only present in authenticated responses (create/update)
   originalUrl?: string;
   httpMethod: string;
   paymentAmount: string;
@@ -24,6 +23,9 @@ export interface Endpoint {
   customAuthHeaders?: Record<string, string> | null;
   sampleBody?: any;
   sampleResponse?: any;
+  totalEarnings?: string;
+  averageRating?: number;
+  totalReviews?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -101,24 +103,16 @@ export const authApi = {
 
     const data: LoginResponse = await response.json();
 
-    // Store token and user data
     setAuthToken(data.token);
     setAuthUser(data.user);
 
     return data;
   },
 
-  /**
-   * Logout and clear local storage
-   */
   async logout(): Promise<void> {
-    // Always clear local storage
     clearAuthToken();
   },
 
-  /**
-   * Verify if current token is valid
-   */
   async verifyToken(): Promise<{ valid: boolean; user?: AuthUser }> {
     const token = getAuthToken();
 
@@ -174,7 +168,6 @@ export const endpointsApi = {
     if (!response.ok) throw new Error('Failed to fetch user endpoints');
     const data = await response.json();
 
-    // If endpoints don't have username, fetch it from user profile
     if (data.endpoints && data.endpoints.length > 0 && !data.endpoints[0].username) {
       try {
         const userResponse = await fetch(`${API_BASE_URL}/user/profile`, {
@@ -277,7 +270,6 @@ export function getMcpUrl(username: string): string {
   return `${API_BASE_URL}/mcp/${username}`;
 }
 
-// Alternative function names for consistency
 export function buildProxyUrl(username: string, endpointName: string): string {
   return getProxyUrl(username, endpointName);
 }
@@ -286,17 +278,14 @@ export function buildMcpUrl(username: string): string {
   return getMcpUrl(username);
 }
 
-// Helper function for fetching JSON
 export async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${url}`);
   if (!response.ok) throw new Error('Failed to fetch');
   return response.json();
 }
 
-// Extended endpoint detail type
 export type EndpointDetail = Endpoint;
 
-// Helper functions for my-endpoints page
 export async function getMyEndpoints(walletAddress: string): Promise<{
   endpoints: Endpoint[];
 }> {
@@ -321,7 +310,6 @@ export async function deleteEndpoint(id: string): Promise<{ message: string }> {
   return endpointsApi.deleteEndpoint(id);
 }
 
-// Helper functions for wallet page
 export async function getCurrentUser(): Promise<User> {
   return userApi.getProfile();
 }
@@ -329,3 +317,58 @@ export async function getCurrentUser(): Promise<User> {
 export async function updateUsername(username: string): Promise<{ message: string; user: User }> {
   return userApi.updateProfile(username);
 }
+
+export interface Review {
+  id: string;
+  endpointId: string;
+  userWallet: string;
+  rating: number;
+  createdAt: string;
+}
+
+export interface CreateReviewData {
+  endpointId: string;
+  rating: number;
+}
+
+export const reviewsApi = {
+  async createReview(data: CreateReviewData): Promise<{ message: string; review: Review }> {
+    const headers = getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/reviews`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create review');
+    }
+    return response.json();
+  },
+
+  async getEndpointReviews(endpointId: string): Promise<{ reviews: Review[]; count: number }> {
+    const response = await fetch(`${API_BASE_URL}/reviews/endpoint/${endpointId}`);
+    if (!response.ok) throw new Error('Failed to fetch reviews');
+    return response.json();
+  },
+
+  async getAverageRating(
+    endpointId: string,
+  ): Promise<{ averageRating: number; totalReviews: number }> {
+    const response = await fetch(`${API_BASE_URL}/reviews/endpoint/${endpointId}/average`);
+    if (!response.ok) throw new Error('Failed to fetch average rating');
+    return response.json();
+  },
+
+  async getMyReview(endpointId: string): Promise<Review> {
+    const headers = getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/reviews/my-review/${endpointId}`, {
+      headers,
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch review');
+    }
+    return response.json();
+  },
+};

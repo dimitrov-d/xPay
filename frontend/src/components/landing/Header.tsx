@@ -17,13 +17,10 @@ export const Header = () => {
   const isHomePage = pathname === "/";
 
   const handleSignInSuccess = () => {
-    // Don't redirect immediately - let the SignatureModal handle authentication flow
-    // The modal will appear automatically via useRequireAuth hook on the home page
     setIsSignInOpen(false);
   };
 
   const handleGetStartedClick = () => {
-    // Only redirect if user is fully authenticated (has JWT token)
     if (currentUser && isAuthenticated()) {
       router.push("/dashboard");
     } else {

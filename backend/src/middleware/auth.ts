@@ -21,7 +21,7 @@ export function verifyAuth(req: AuthenticatedRequest, res: Response, next: NextF
     });
   }
 
-  const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+  const token = authHeader.split(' ')[1]; // Remove 'Bearer ' prefix
   const decoded = verifyToken(token);
 
   if (!decoded) {

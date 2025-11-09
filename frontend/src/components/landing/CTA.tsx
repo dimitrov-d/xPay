@@ -1,12 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { isAuthenticated } from "@/lib/auth";
 import { useCurrentUser } from "@coinbase/cdp-hooks";
 import { SignInModal, SignInModalContent } from "@coinbase/cdp-react";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { isAuthenticated } from "@/lib/auth";
 
 export const CTA = () => {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
@@ -14,12 +14,10 @@ export const CTA = () => {
   const { currentUser } = useCurrentUser();
 
   const handleSignInSuccess = () => {
-    // Don't redirect immediately - let the SignatureModal handle authentication flow
     setIsSignInOpen(false);
   };
 
   const handleGetStartedClick = () => {
-    // Only redirect if user is fully authenticated (has JWT token)
     if (currentUser && isAuthenticated()) {
       router.push("/dashboard");
     } else {

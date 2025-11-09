@@ -5,6 +5,7 @@ import authRouter from './routes/auth';
 import endpointsRouter from './routes/endpoints';
 import mcpRouter from './routes/mcp';
 import proxyRouter from './routes/proxy';
+import reviewsRouter from './routes/reviews';
 import userRouter from './routes/user';
 
 dotenv.config();
@@ -32,6 +33,8 @@ app.use('/auth', authRouter);
 app.use('/endpoints', endpointsRouter);
 
 app.use('/user', userRouter);
+
+app.use('/reviews', reviewsRouter);
 
 app.use('/mcp', mcpRouter);
 

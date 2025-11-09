@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,13 +12,18 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Endpoint, getMcpUrl, getProxyUrl } from "@/lib/api";
+import { Star } from "lucide-react";
+import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { ReviewEndpointModal } from "./ReviewEndpointModal";
 
 interface EndpointDetailsModalProps {
   endpoint: Endpoint | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  currentUserWallet?: string;
+  onReviewSubmitted?: () => void;
 }
 
 const getMethodColor = (method: string) => {
@@ -74,22 +80,69 @@ export function EndpointDetailsModal({
   endpoint,
   open,
   onOpenChange,
+  currentUserWallet,
+  onReviewSubmitted,
 }: EndpointDetailsModalProps) {
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+
   if (!endpoint) return null;
 
   const proxyUrl = getProxyUrl(endpoint.username || "", endpoint.name);
   const mcpUrl = getMcpUrl(endpoint.username || "");
+  const isOwnEndpoint = currentUserWallet && endpoint.userWallet === currentUserWallet;
+
+  const renderStars = (rating: number) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(
+          <Star
+            key={i}
+            className="w-5 h-5 fill-green-500 text-green-500"
+          />
+        );
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(
+          <div key={i} className="relative w-5 h-5">
+            <Star className="w-5 h-5 text-green-500 absolute" />
+            <div className="absolute inset-0 overflow-hidden w-1/2">
+              <Star className="w-5 h-5 fill-green-500 text-green-500" />
+            </div>
+          </div>
+        );
+      } else {
+        stars.push(
+          <Star key={i} className="w-5 h-5 text-gray-300" />
+        );
+      }
+    }
+    return stars;
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-center gap-3">
-            <DialogTitle className="text-2xl">{endpoint.name}</DialogTitle>
-            <Badge className={getMethodColor(endpoint.httpMethod)}>{endpoint.httpMethod}</Badge>
-          </div>
-          <DialogDescription>{endpoint.description}</DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <DialogTitle className="text-2xl">{endpoint.name}</DialogTitle>
+              <Badge className={getMethodColor(endpoint.httpMethod)}>{endpoint.httpMethod}</Badge>
+            </div>
+            <DialogDescription>{endpoint.description}</DialogDescription>
+            {endpoint.averageRating !== undefined && endpoint.averageRating > 0 && (
+              <div className="flex items-center gap-2 pt-2">
+                <div className="flex items-center gap-1">
+                  {renderStars(endpoint.averageRating)}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {endpoint.averageRating.toFixed(1)} ({endpoint.totalReviews} {endpoint.totalReviews === 1 ? 'review' : 'reviews'})
+                </span>
+              </div>
+            )}
+          </DialogHeader>
 
         <div className="space-y-6">
           <div className="border-t pt-4">
@@ -113,6 +166,19 @@ export function EndpointDetailsModal({
                 <span className="text-lg font-bold">@{endpoint.username || "unknown"}</span>
               </div>
             </div>
+            {!isOwnEndpoint && (
+              <div className="mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setReviewModalOpen(true)}
+                  className="w-full"
+                >
+                  <Star className="w-4 h-4 mr-2" />
+                  Rate this Endpoint
+                </Button>
+              </div>
+            )}
           </div>
 
           <Tabs defaultValue="urls" className="w-full">
@@ -159,6 +225,17 @@ export function EndpointDetailsModal({
         </div>
       </DialogContent>
     </Dialog>
+
+    <ReviewEndpointModal
+      endpoint={endpoint}
+      open={reviewModalOpen}
+      onOpenChange={setReviewModalOpen}
+      currentUserWallet={currentUserWallet}
+      onReviewSubmitted={() => {
+        onReviewSubmitted?.();
+      }}
+    />
+  </>
   );
 }
 

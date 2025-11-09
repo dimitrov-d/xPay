@@ -18,7 +18,6 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
   const { currentUser } = useCurrentUser();
 
   useEffect(() => {
-    // Update body padding when sidebar collapses
     const mainElement = document.querySelector('main');
     if (mainElement) {
       mainElement.style.marginLeft = collapsed ? '4rem' : '16rem';

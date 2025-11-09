@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Endpoint, getProxyUrl } from "@/lib/api";
-import { Copy, Edit, Play } from "lucide-react";
+import { Copy, Edit, Play, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { TestEndpointModal } from "./TestEndpointModal";
@@ -12,6 +12,7 @@ import { TestEndpointModal } from "./TestEndpointModal";
 interface EndpointCardProps {
   endpoint: Endpoint;
   onViewDetails: (endpoint: Endpoint) => void;
+  showEarnings?: boolean;
 }
 
 const getMethodColor = (method: string) => {
@@ -31,9 +32,42 @@ const getMethodColor = (method: string) => {
   }
 };
 
-export function EndpointCard({ endpoint, onViewDetails }: EndpointCardProps) {
-  const proxyUrl = getProxyUrl(endpoint.username || "", endpoint.name);
+export function EndpointCard({ endpoint, onViewDetails, showEarnings = false }: EndpointCardProps) {
+  const proxyUrl = endpoint.username
+    ? getProxyUrl(endpoint.username, endpoint.name)
+    : "Username not available";
   const [testModalOpen, setTestModalOpen] = useState(false);
+
+  const renderStars = (rating: number) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(
+          <Star
+            key={i}
+            className="w-4 h-4 fill-green-500 text-green-500"
+          />
+        );
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(
+          <div key={i} className="relative w-4 h-4">
+            <Star className="w-4 h-4 text-green-500 absolute" />
+            <div className="absolute inset-0 overflow-hidden w-1/2">
+              <Star className="w-4 h-4 fill-green-500 text-green-500" />
+            </div>
+          </div>
+        );
+      } else {
+        stars.push(
+          <Star key={i} className="w-4 h-4 text-gray-300" />
+        );
+      }
+    }
+    return stars;
+  };
 
   return (
     <>
@@ -43,6 +77,14 @@ export function EndpointCard({ endpoint, onViewDetails }: EndpointCardProps) {
             <div className="flex-1">
               <CardTitle className="text-xl mb-2">{endpoint.name}</CardTitle>
               <CardDescription>{endpoint.description}</CardDescription>
+              {endpoint.averageRating !== undefined && (
+                <div className="flex items-center gap-1 mt-2">
+                  {renderStars(endpoint.averageRating)}
+                  <span className="text-xs text-muted-foreground ml-1">
+                    ({endpoint.averageRating.toFixed(1)} • {endpoint.totalReviews} {endpoint.totalReviews === 1 ? 'review' : 'reviews'})
+                  </span>
+                </div>
+              )}
             </div>
             <Badge className={`ml-2 ${getMethodColor(endpoint.httpMethod)}`}>
               {endpoint.httpMethod}
@@ -55,17 +97,19 @@ export function EndpointCard({ endpoint, onViewDetails }: EndpointCardProps) {
               <p className="text-xs text-muted-foreground">Proxy URL:</p>
               <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 border">
                 <code className="flex-1 text-xs break-all">{proxyUrl}</code>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="shrink-0 w-6 h-6"
-                  onClick={() => {
-                    navigator.clipboard.writeText(proxyUrl);
-                    toast.success("Proxy URL copied to clipboard");
-                  }}
-                >
-                  <Copy className="w-3 h-3" />
-                </Button>
+                {endpoint.username && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 w-6 h-6"
+                    onClick={() => {
+                      navigator.clipboard.writeText(proxyUrl);
+                      toast.success("Proxy URL copied to clipboard");
+                    }}
+                  >
+                    <Copy className="w-3 h-3" />
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -90,6 +134,22 @@ export function EndpointCard({ endpoint, onViewDetails }: EndpointCardProps) {
                   <span className="text-sm font-medium">@{endpoint.username || "unknown"}</span>
                 </div>
               </div>
+              {showEarnings && endpoint.totalEarnings !== undefined && (
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t">
+                  <span className="text-xs text-muted-foreground">Total Earnings:</span>
+                  <div className="flex items-center gap-1">
+                    <img
+                      src="/usdc.svg"
+                      alt="USDC"
+                      className="w-5 h-5"
+                      style={{ display: "inline-block", verticalAlign: "middle" }}
+                    />
+                    <span className="font-bold text-xl text-green-600 dark:text-green-500">
+                      {parseFloat(endpoint.totalEarnings).toFixed(4)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

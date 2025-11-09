@@ -32,7 +32,6 @@ router.get('/profile', verifyAuth, async (req: AuthenticatedRequest, res: Respon
       });
     }
 
-    // Fetch SOL and USDC balances
     let solBalance = 0;
     let usdcBalance = 0;
 
@@ -40,11 +39,9 @@ router.get('/profile', verifyAuth, async (req: AuthenticatedRequest, res: Respon
       const connection = new Connection(getRpcUrl());
       const publicKey = new PublicKey(walletAddress);
 
-      // Get SOL balance
       const balance = await connection.getBalance(publicKey);
       solBalance = balance / LAMPORTS_PER_SOL;
 
-      // Get USDC balance
       const usdcMint = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
       const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
         mint: usdcMint,
@@ -55,7 +52,6 @@ router.get('/profile', verifyAuth, async (req: AuthenticatedRequest, res: Respon
       }
     } catch (balanceError: any) {
       console.error('Error fetching balances:', balanceError);
-      // Continue without balances if there's an error
     }
 
     return res.json({

@@ -1,7 +1,7 @@
-import { and, count, eq, getTableColumns } from 'drizzle-orm';
+import { and, avg, count, eq, getTableColumns, inArray, sql } from 'drizzle-orm';
 import { Response, Router } from 'express';
 import { db } from '../config/database';
-import { endpoints, users } from '../db/schema';
+import { endpoints, reviews, users } from '../db/schema';
 import {
   createEndpointSchema,
   deleteEndpointParamsSchema,
@@ -18,7 +18,6 @@ import { validateBody, validateParams, validateQuery } from '../middleware/valid
 
 const router = Router();
 
-// Exclude sensitive fields from public endpoint responses
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { originalUrl, customAuthHeaders, ...publicEndpointColumns } = getTableColumns(endpoints);
 
@@ -42,10 +41,42 @@ router.get('/', validateQuery(listEndpointsQuerySchema), async (req, res: Respon
       .offset(offset)
       .orderBy(endpoints.createdAt);
 
+    // Fetch average ratings for all endpoints
+    const endpointIds = allEndpoints.map((e) => e.id);
+    const ratingsMap = new Map<string, { averageRating: number; totalReviews: number }>();
+
+    if (endpointIds.length > 0) {
+      const ratingsResults = await db
+        .select({
+          endpointId: reviews.endpointId,
+          averageRating: avg(reviews.rating),
+          totalReviews: sql<number>`count(*)::int`,
+        })
+        .from(reviews)
+        .where(inArray(reviews.endpointId, endpointIds))
+        .groupBy(reviews.endpointId);
+
+      ratingsResults.forEach((result) => {
+        ratingsMap.set(result.endpointId, {
+          averageRating: result.averageRating ? parseFloat(result.averageRating) : 0,
+          totalReviews: result.totalReviews || 0,
+        });
+      });
+    }
+
+    const endpointsWithRatings = allEndpoints.map((endpoint) => {
+      const rating = ratingsMap.get(endpoint.id);
+      return {
+        ...endpoint,
+        averageRating: rating?.averageRating || 0,
+        totalReviews: rating?.totalReviews || 0,
+      };
+    });
+
     const [{ total }] = await db.select({ total: count() }).from(endpoints);
 
     return res.json({
-      endpoints: allEndpoints,
+      endpoints: endpointsWithRatings,
       pagination: {
         page,
         limit,
@@ -194,8 +225,12 @@ router.get(
       const { wallet } = req.validatedParams;
 
       const userEndpoints = await db
-        .select()
+        .select({
+          ...getTableColumns(endpoints),
+          username: users.username,
+        })
         .from(endpoints)
+        .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
         .where(eq(endpoints.userWallet, wallet))
         .orderBy(endpoints.createdAt);
 

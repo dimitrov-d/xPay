@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import {
+  createEndpoint,
   deleteEndpoint,
   getMyEndpoints,
   updateEndpoint,
@@ -82,7 +83,6 @@ export default function MyEndpointsPage() {
     return null;
   }
 
-  // Don't render page content until authenticated
   if (!isReady) {
     return (
       <>
@@ -140,6 +140,7 @@ export default function MyEndpointsPage() {
                     <EndpointCard
                       key={endpoint.id || `endpoint-${index}`}
                       endpoint={endpoint}
+                      showEarnings={true}
                       onViewDetails={(endpoint) => {
                         setEditingEndpoint(endpoint);
                         setShowAddModal(true);
@@ -161,7 +162,6 @@ export default function MyEndpointsPage() {
             }}
             onSubmit={editingEndpoint ? handleUpdateEndpoint : async (data) => {
               try {
-                const { createEndpoint } = await import("@/lib/api");
                 await createEndpoint(data as CreateEndpointData);
                 toast.success("Endpoint created successfully");
                 await loadEndpoints();

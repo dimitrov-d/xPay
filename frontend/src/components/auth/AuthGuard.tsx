@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
 import { authApi } from "@/lib/api";
-import { isAuthenticated, getAuthUser } from "@/lib/auth";
+import { getAuthUser, isAuthenticated } from "@/lib/auth";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -19,8 +19,8 @@ interface AuthGuardProps {
  *   <ProtectedContent />
  * </AuthGuard>
  */
-export function AuthGuard({ 
-  children, 
+export function AuthGuard({
+  children,
   requireAuth = true,
   redirectTo = "/"
 }: AuthGuardProps) {
@@ -37,7 +37,6 @@ export function AuthGuard({
         return;
       }
 
-      // Check if token exists
       if (!isAuthenticated()) {
         setIsAuthorized(false);
         setIsVerifying(false);
@@ -45,10 +44,9 @@ export function AuthGuard({
         return;
       }
 
-      // Verify token with backend
       try {
         const result = await authApi.verifyToken();
-        
+
         if (result.valid) {
           setIsAuthorized(true);
         } else {
@@ -67,7 +65,6 @@ export function AuthGuard({
     verifyAuth();
   }, [pathname, requireAuth, redirectTo, router]);
 
-  // Show loading state while verifying
   if (isVerifying) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -79,7 +76,6 @@ export function AuthGuard({
     );
   }
 
-  // Show children only if authorized
   return isAuthorized ? <>{children}</> : null;
 }
 
@@ -90,7 +86,6 @@ export function useAuthUser() {
   const [user, setUser] = useState(getAuthUser());
 
   useEffect(() => {
-    // Update user if token changes
     const handleStorageChange = () => {
       setUser(getAuthUser());
     };

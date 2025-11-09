@@ -1,12 +1,12 @@
 "use client";
 
-import { useSignSolanaMessage, useSolanaAddress } from "@coinbase/cdp-hooks";
-import { useState, useEffect } from "react";
-import { authApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { authApi } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
+import { useSignSolanaMessage, useSolanaAddress } from "@coinbase/cdp-hooks";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function LoginButton() {
   const { signSolanaMessage } = useSignSolanaMessage();
@@ -14,7 +14,6 @@ export function LoginButton() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Auto-redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated() && solanaAddress) {
       router.push("/dashboard");
@@ -32,7 +31,6 @@ export function LoginButton() {
     setIsLoading(true);
 
     try {
-      // Create message to sign with clear formatting
       const timestamp = Date.now();
       const message = `Sign this message to authenticate with xPay.
 
@@ -43,8 +41,6 @@ This will not cost any gas fees.`;
 
       console.log("Requesting signature for message:", message);
 
-      // Sign the message using Coinbase CDP
-      // The message needs to be in the format expected by the wallet
       const result = await signSolanaMessage({
         solanaAccount: solanaAddress,
         message: Buffer.from(message, "utf8").toString("base64"),
@@ -58,7 +54,6 @@ This will not cost any gas fees.`;
 
       console.log("Sending login request to backend...");
 
-      // Login with the signature
       const loginResponse = await authApi.login(
         solanaAddress,
         message,
@@ -71,14 +66,12 @@ This will not cost any gas fees.`;
         description: `Welcome back, ${loginResponse.user.username}`,
       });
 
-      // Redirect to dashboard
       router.push("/dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
-      
-      // Provide more specific error messages
+
       let errorMessage = error.message || "Failed to authenticate. Please try again.";
-      
+
       if (error.message?.includes("User rejected")) {
         errorMessage = "You rejected the signature request. Please try again.";
       } else if (error.message?.includes("signature")) {

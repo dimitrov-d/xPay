@@ -24,7 +24,6 @@ router.post('/login', async (req, res: Response) => {
   try {
     const { walletAddress, message, signature } = req.body;
 
-    // Validate required fields
     if (!walletAddress || !message || !signature) {
       return res.status(400).json({
         error: 'Missing required fields',
@@ -32,7 +31,6 @@ router.post('/login', async (req, res: Response) => {
       });
     }
 
-    // Verify the signature
     const isValid = verifySolanaSignature(walletAddress, message, signature);
 
     if (!isValid) {
@@ -41,16 +39,13 @@ router.post('/login', async (req, res: Response) => {
       });
     }
 
-    // Find or create user
     let [user] = await db
       .select()
       .from(users)
       .where(eq(users.walletAddress, walletAddress))
       .limit(1);
 
-    // If user doesn't exist, create a default profile
     if (!user) {
-      // Generate a default username from wallet address
       const defaultUsername = `user_${walletAddress.slice(0, 8)}`;
 
       [user] = await db
@@ -62,7 +57,6 @@ router.post('/login', async (req, res: Response) => {
         .returning();
     }
 
-    // Generate JWT token
     const token = generateToken(user.walletAddress, user.username);
 
     return res.json({
@@ -82,20 +76,6 @@ router.post('/login', async (req, res: Response) => {
     });
   }
 });
-
-/**
- * POST /auth/logout
- * Logout endpoint (client should remove token)
- * Note: Since JWT is stateless, actual invalidation happens on client side
- *
- * Response:
- * - message: string - Success message
- */
-router.post('/logout', (req, res: Response) =>
-  res.json({
-    message: 'Logout successful',
-  }),
-);
 
 /**
  * GET /auth/verify
@@ -127,7 +107,6 @@ router.get('/verify', async (req, res: Response) => {
       });
     }
 
-    // Optionally, verify user still exists in database
     const [user] = await db
       .select()
       .from(users)

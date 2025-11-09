@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CreateEndpointData, Endpoint, endpointsApi, userApi } from "@/lib/api";
+import { isAuthenticated } from "@/lib/auth";
 import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
 import { Loader2, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -36,11 +37,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Check for JWT authentication
-        const { isAuthenticated } = await import("@/lib/auth");
-
         if (!isAuthenticated()) {
-          return; // Don't fetch if not authenticated
+          return;
         }
 
         const profile = await userApi.getProfile();
@@ -220,6 +218,15 @@ export default function DashboardPage() {
         endpoint={selectedEndpoint}
         open={detailsModalOpen}
         onOpenChange={setDetailsModalOpen}
+        currentUserWallet={solanaAddress || undefined}
+        onReviewSubmitted={async () => {
+          try {
+            const data = await endpointsApi.getAllEndpoints(1, 100);
+            setEndpoints(data.endpoints);
+          } catch (error) {
+            console.error("Failed to refresh endpoints:", error);
+          }
+        }}
       />
 
       <AddEndpointModal

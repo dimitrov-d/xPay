@@ -17,7 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
-import { updateUsername } from "@/lib/api";
+import { getCurrentUser, updateUsername } from "@/lib/api";
 import { useCurrentUser, useExportSolanaAccount, useSolanaAddress } from "@coinbase/cdp-hooks";
 import { AlertTriangle, Check, Copy, Loader2, Save, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -59,14 +59,11 @@ export default function ProfilePage() {
       setLoading(true);
       setLoadingBalances(true);
 
-      // Import the API functions that use JWT
-      const { getCurrentUser } = await import("@/lib/api");
       const user = await getCurrentUser();
 
       setUsername(user.username);
       setNewUsername(user.username);
 
-      // Set balances from response
       if (user.balances) {
         setSolBalance(user.balances.sol || 0);
         setUsdcBalance(user.balances.usdc || 0);
@@ -135,7 +132,6 @@ export default function ProfilePage() {
         solanaAccount: solanaAddress,
       });
 
-      // Copy to clipboard
       await navigator.clipboard.writeText(privateKey);
 
       toast.warning("Private key copied to clipboard. Please store it securely and clear your clipboard immediately.");
@@ -153,7 +149,6 @@ export default function ProfilePage() {
     return null;
   }
 
-  // Don't render page content until authenticated
   if (!isReady) {
     return (
       <>
