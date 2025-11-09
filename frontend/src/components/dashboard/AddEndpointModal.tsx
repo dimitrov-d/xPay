@@ -18,26 +18,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CreateEndpointData } from "@/lib/api";
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { CreateEndpointData, Endpoint, UpdateEndpointData } from "@/lib/api";
+import { getAuthUser } from "@/lib/auth";
+import { Info, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface AddEndpointModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: CreateEndpointData) => Promise<void>;
+  onSubmit: (data: CreateEndpointData | UpdateEndpointData) => Promise<void>;
+  endpoint?: Endpoint;
   defaultUsername?: string;
 }
 
 const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"];
+const TOKEN_TYPES = ["SOL", "USDC", "USDT", "CASH"];
 
 export function AddEndpointModal({
   open,
   onOpenChange,
   onSubmit,
+  endpoint,
   defaultUsername = "",
 }: AddEndpointModalProps) {
   const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState(defaultUsername);
   const [formData, setFormData] = useState<CreateEndpointData>({
     username: defaultUsername,
     name: "",
@@ -51,13 +62,33 @@ export function AddEndpointModal({
     sampleResponse: null,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await onSubmit(formData);
+  // Get username from current user and initialize form data
+  useEffect(() => {
+    const user = getAuthUser();
+    const currentUsername = user?.username || defaultUsername;
+
+    if (currentUsername) {
+      setUsername(currentUsername);
+    }
+
+    if (endpoint) {
+      // Edit mode - populate with endpoint data
       setFormData({
-        username: defaultUsername,
+        username: endpoint.username || currentUsername,
+        name: endpoint.name,
+        description: endpoint.description,
+        originalUrl: endpoint.originalUrl || "",
+        httpMethod: endpoint.httpMethod as any,
+        paymentAmount: parseFloat(endpoint.paymentAmount) || 0.001,
+        tokenType: endpoint.tokenType || "SOL",
+        customAuthHeaders: endpoint.customAuthHeaders || null,
+        sampleBody: endpoint.sampleBody || null,
+        sampleResponse: endpoint.sampleResponse || null,
+      });
+    } else {
+      // Create mode - reset to defaults
+      setFormData({
+        username: currentUsername,
         name: "",
         description: "",
         originalUrl: "",
@@ -68,9 +99,34 @@ export function AddEndpointModal({
         sampleBody: null,
         sampleResponse: null,
       });
+    }
+  }, [endpoint, defaultUsername, open]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (endpoint) {
+        // Edit mode - submit update data without username
+        const updateData: UpdateEndpointData = {
+          name: formData.name,
+          description: formData.description,
+          originalUrl: formData.originalUrl,
+          httpMethod: formData.httpMethod,
+          paymentAmount: formData.paymentAmount,
+          tokenType: formData.tokenType,
+          customAuthHeaders: formData.customAuthHeaders,
+          sampleBody: formData.sampleBody,
+          sampleResponse: formData.sampleResponse,
+        };
+        await onSubmit(updateData);
+      } else {
+        // Create mode - submit full data with username
+        await onSubmit(formData);
+      }
       onOpenChange(false);
     } catch (error) {
-      console.error("Failed to create endpoint:", error);
+      console.error("Failed to submit endpoint:", error);
     } finally {
       setLoading(false);
     }
@@ -84,31 +140,31 @@ export function AddEndpointModal({
     }
   };
 
+  const formatJSON = (value: any): string => {
+    if (!value) return "";
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return "";
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Add New Endpoint</DialogTitle>
-          <DialogDescription>
-            Create a new x402-protected endpoint for your API
-          </DialogDescription>
-        </DialogHeader>
+    <TooltipProvider>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {endpoint ? "Edit Endpoint" : "Add New Endpoint"}
+            </DialogTitle>
+            <DialogDescription>
+              {endpoint
+                ? "Update your endpoint details"
+                : "Create a new x402-protected endpoint for your API"}
+            </DialogDescription>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-                required
-                placeholder="your-username"
-              />
-            </div>
-
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Endpoint Name</Label>
               <Input
@@ -121,153 +177,235 @@ export function AddEndpointModal({
                 placeholder="my-endpoint"
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              required
-              placeholder="Describe what this endpoint does..."
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="originalUrl">Original API URL</Label>
-            <Input
-              id="originalUrl"
-              type="url"
-              value={formData.originalUrl}
-              onChange={(e) =>
-                setFormData({ ...formData, originalUrl: e.target.value })
-              }
-              required
-              placeholder="https://api.example.com/endpoint"
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="httpMethod">HTTP Method</Label>
-              <Select
-                value={formData.httpMethod}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, httpMethod: value })
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {HTTP_METHODS.map((method) => (
-                    <SelectItem key={method} value={method}>
-                      {method}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                required
+                placeholder="Describe what this endpoint does..."
+                rows={3}
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="paymentAmount">Payment Amount</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="originalUrl">Original API URL</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>The private URL of your API endpoint that will be paywalled</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <Input
-                id="paymentAmount"
-                type="number"
-                step="0.001"
-                min="0"
-                value={formData.paymentAmount}
+                id="originalUrl"
+                type="url"
+                value={formData.originalUrl}
+                onChange={(e) =>
+                  setFormData({ ...formData, originalUrl: e.target.value })
+                }
+                required
+                placeholder="https://api.example.com/endpoint"
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="httpMethod">HTTP Method</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>The HTTP method used to call this endpoint</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Select
+                  value={formData.httpMethod}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, httpMethod: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HTTP_METHODS.map((method) => (
+                      <SelectItem key={method} value={method}>
+                        {method}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="paymentAmount">Payment Amount</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>The amount users must pay to access this endpoint</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Input
+                  id="paymentAmount"
+                  type="number"
+                  step="0.001"
+                  min="0"
+                  value={formData.paymentAmount}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      paymentAmount: parseFloat(e.target.value),
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="tokenType">Token Type</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>The cryptocurrency token used for payment</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Select
+                  value={formData.tokenType}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, tokenType: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TOKEN_TYPES.map((token) => (
+                      <SelectItem key={token} value={token}>
+                        {token}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="customAuthHeaders">
+                  Custom Auth Headers (JSON)
+                </Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Optional authentication headers to include in requests to your API</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Textarea
+                id="customAuthHeaders"
+                placeholder='{"Authorization": "Bearer token"}'
+                rows={3}
+                value={formatJSON(formData.customAuthHeaders)}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    paymentAmount: parseFloat(e.target.value),
+                    customAuthHeaders: parseJSON(e.target.value) as Record<string, string>,
                   })
                 }
-                required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tokenType">Token Type</Label>
-              <Input
-                id="tokenType"
-                value={formData.tokenType}
+              <div className="flex items-center gap-2">
+                <Label htmlFor="sampleBody">Sample Request Body (JSON)</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Example request body to help users understand the expected format</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Textarea
+                id="sampleBody"
+                placeholder='{"key": "value"}'
+                rows={3}
+                value={formatJSON(formData.sampleBody)}
                 onChange={(e) =>
-                  setFormData({ ...formData, tokenType: e.target.value })
+                  setFormData({
+                    ...formData,
+                    sampleBody: parseJSON(e.target.value),
+                  })
                 }
-                required
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="customAuthHeaders">
-              Custom Auth Headers (JSON)
-            </Label>
-            <Textarea
-              id="customAuthHeaders"
-              placeholder='{"Authorization": "Bearer token"}'
-              rows={3}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  customAuthHeaders: parseJSON(e.target.value) as Record<string, string>,
-                })
-              }
-            />
-          </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="sampleResponse">Sample Response (JSON)</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Example response to help users understand what to expect</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <Textarea
+                id="sampleResponse"
+                placeholder='{"result": "success"}'
+                rows={3}
+                value={formatJSON(formData.sampleResponse)}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    sampleResponse: parseJSON(e.target.value),
+                  })
+                }
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="sampleBody">Sample Request Body (JSON)</Label>
-            <Textarea
-              id="sampleBody"
-              placeholder='{"key": "value"}'
-              rows={3}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  sampleBody: parseJSON(e.target.value),
-                })
-              }
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="sampleResponse">Sample Response (JSON)</Label>
-            <Textarea
-              id="sampleResponse"
-              placeholder='{"result": "success"}'
-              rows={3}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  sampleResponse: parseJSON(e.target.value),
-                })
-              }
-            />
-          </div>
-
-          <div className="flex gap-3 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Create Endpoint
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <div className="flex gap-3 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {endpoint ? "Update" : "Create"} Endpoint
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </TooltipProvider>
   );
 }
 

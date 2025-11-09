@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { EndpointCard } from "@/components/dashboard/EndpointCard";
-import { EndpointFormModal } from "@/components/dashboard/EndpointFormModal";
+import { AddEndpointModal } from "@/components/dashboard/AddEndpointModal";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import {
   AlertDialog,
@@ -185,7 +185,7 @@ export default function MyEndpointsPage() {
         </main>
 
         {showAddModal && (
-          <EndpointFormModal
+          <AddEndpointModal
             open={showAddModal}
             onOpenChange={(open) => {
               setShowAddModal(open);
@@ -204,7 +204,7 @@ export default function MyEndpointsPage() {
               }
             }}
             endpoint={editingEndpoint}
-            username={username || ""}
+            defaultUsername={username || ""}
           />
         )}
 

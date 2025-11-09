@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Endpoint, getMcpUrl, getProxyUrl } from "@/lib/api";
+import { Endpoint, getProxyUrl } from "@/lib/api";
 import { Code, Copy, Play } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +33,6 @@ const getMethodColor = (method: string) => {
 
 export function EndpointCard({ endpoint, onViewDetails }: EndpointCardProps) {
   const proxyUrl = getProxyUrl(endpoint.username || "", endpoint.name);
-  const mcpUrl = getMcpUrl(endpoint.username || "");
   const [testModalOpen, setTestModalOpen] = useState(false);
 
   return (
@@ -63,24 +62,6 @@ export function EndpointCard({ endpoint, onViewDetails }: EndpointCardProps) {
                   onClick={() => {
                     navigator.clipboard.writeText(proxyUrl);
                     toast.success("Proxy URL copied to clipboard");
-                  }}
-                >
-                  <Copy className="w-3 h-3" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-1 mb-4">
-              <p className="text-xs text-muted-foreground">MCP Server URL:</p>
-              <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 border">
-                <code className="flex-1 text-xs break-all">{mcpUrl}</code>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="shrink-0 w-6 h-6"
-                  onClick={() => {
-                    navigator.clipboard.writeText(mcpUrl);
-                    toast.success("MCP Server URL copied to clipboard");
                   }}
                 >
                   <Copy className="w-3 h-3" />
