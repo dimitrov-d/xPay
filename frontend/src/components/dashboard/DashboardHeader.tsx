@@ -1,11 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useCurrentUser } from "@coinbase/cdp-hooks";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { User, Menu, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,9 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authApi } from "@/lib/api";
-import { useSignOut } from "@coinbase/cdp-hooks";
-import { toast } from "sonner";
+import { useCurrentUser, useSignOut } from "@coinbase/cdp-hooks";
+import { List, LogOut, Menu, User, Wallet } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface DashboardHeaderProps {
   onToggleSidebar?: () => void;
@@ -55,22 +54,25 @@ export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="w-full px-4">
+      <div className="w-full px-6">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             {currentUser && onToggleSidebar && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onToggleSidebar}
-                className="w-10 h-10"
-              >
-                <Menu className="w-5 h-5" />
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onToggleSidebar}
+                  className="w-12 h-12"
+                >
+                  <Menu className="w-5 h-5" />
+                </Button>
+                <div className="h-8 w-px bg-border" />
+              </>
             )}
             <Link
               href="/"
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer px-2 py-2"
             >
               <Image
                 src="/logo.png"
@@ -84,34 +86,45 @@ export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
           </div>
 
           {currentUser && (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
+              <div className="h-8 w-px bg-border" />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full w-10 h-10 bg-accent/10"
+                    className="rounded-full w-12 h-12 bg-accent/10 hover:bg-accent/20"
                   >
                     <div className="rounded-full bg-accent p-2">
                       <User className="w-5 h-5 text-accent-foreground" />
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => router.push("/wallet")}>
-                    Wallet & Profile
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem
+                    onClick={() => router.push("/wallet")}
+                    className="px-4 py-3 cursor-pointer"
+                  >
+                    <Wallet className="mr-3 h-5 w-5" />
+                    <span className="font-medium">Wallet & Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push("/my-endpoints")}>
-                    My Endpoints
+                  <DropdownMenuItem
+                    onClick={() => router.push("/my-endpoints")}
+                    className="px-4 py-3 cursor-pointer"
+                  >
+                    <List className="mr-3 h-5 w-5" />
+                    <span className="font-medium">My Endpoints</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="text-red-600 focus:text-red-600"
+                    className="px-4 py-3 cursor-pointer"
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {isLoggingOut ? "Logging out..." : "Logout"}
+                    <LogOut className="mr-3 h-5 w-5" />
+                    <span className="font-medium">
+                      {isLoggingOut ? "Logging out..." : "Logout"}
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
