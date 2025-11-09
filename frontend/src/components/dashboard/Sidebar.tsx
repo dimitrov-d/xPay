@@ -3,7 +3,7 @@
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@coinbase/cdp-hooks";
-import { ChevronLeft, ChevronRight, Home, LayoutDashboard, List, Wallet } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, LayoutDashboard, List, Server, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -39,6 +39,11 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
       icon: List,
     },
     {
+      name: "MCP Servers",
+      href: "/mcp-servers",
+      icon: Server,
+    },
+    {
       name: "Wallet & Profile",
       href: "/profile",
       icon: Wallet,
@@ -61,8 +66,8 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
                 <Link key={item.href} href={item.href}>
                   <div
                     className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${isActive
-                        ? "bg-accent text-accent-foreground"
-                        : "hover:bg-secondary text-muted-foreground hover:text-foreground"
+                      ? "bg-accent text-accent-foreground"
+                      : "hover:bg-secondary text-muted-foreground hover:text-foreground"
                       }`}
                   >
                     <Icon className="w-5 h-5 shrink-0" />
@@ -89,7 +94,12 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
           </Link>
 
           {!collapsed && (
-            <LogoutButton variant="ghost" size="sm" className="w-full justify-start" />
+            <LogoutButton
+              className="flex items-center gap-3 px-3 py-2 rounded-md transition-colors hover:bg-secondary text-muted-foreground hover:text-foreground w-full justify-start"
+            >
+              <span className="sr-only">Logout</span>
+              <span className="text-sm font-medium">Logout</span>
+            </LogoutButton>
           )}
 
           <Button

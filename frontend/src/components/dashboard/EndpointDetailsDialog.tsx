@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { EndpointDetail, buildMcpUrl, buildProxyUrl, fetchJson } from "@/lib/api";
+import { EndpointDetail, buildProxyUrl, fetchJson } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
@@ -55,7 +55,6 @@ export function EndpointDetailsDialog({
   });
 
   const proxyUrl = buildProxyUrl(username, name);
-  const mcpUrl = buildMcpUrl(username);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,13 +79,6 @@ export function EndpointDetailsDialog({
             <div>
               <div className="text-xs uppercase text-muted-foreground mb-1">Proxy URL</div>
               <code className="block p-2 rounded bg-muted break-all">{proxyUrl}</code>
-            </div>
-            <div>
-              <div className="text-xs uppercase text-muted-foreground mb-1">MCP Server URL</div>
-              <code className="block p-2 rounded bg-muted break-all">{mcpUrl}</code>
-              <p className="text-xs text-muted-foreground mt-2">
-                Use this with any MCP-compatible client. The server exposes your endpoints as MCP tools.
-              </p>
             </div>
             <div className="border-t pt-4">
               <div className="flex items-center justify-between">
