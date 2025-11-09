@@ -29,7 +29,7 @@ interface AddEndpointModalProps {
   defaultUsername?: string;
 }
 
-const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"];
+const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 
 export function AddEndpointModal({
   open,

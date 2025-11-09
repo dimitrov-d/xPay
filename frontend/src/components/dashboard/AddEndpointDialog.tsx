@@ -133,7 +133,7 @@ export function AddEndpointDialog({ onCreated }: { onCreated?: () => void }) {
                   value={httpMethod}
                   onChange={(e) => setHttpMethod(e.target.value)}
                 >
-                  {["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"].map((m) => (
+                  {["GET", "POST", "PUT", "DELETE", "PATCH"].map((m) => (
                     <option key={m} value={m}>
                       {m}
                     </option>

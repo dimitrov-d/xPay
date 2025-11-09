@@ -1,22 +1,9 @@
 "use client";
 
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import { EndpointCard } from "@/components/dashboard/EndpointCard";
 import { EndpointFormModal } from "@/components/dashboard/EndpointFormModal";
-import { Button } from "@/components/ui/button";
-import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import {
-  getMyEndpoints,
-  updateEndpoint,
-  deleteEndpoint,
-  type Endpoint,
-  type UpdateEndpointData,
-} from "@/lib/api";
-import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { Sidebar } from "@/components/dashboard/Sidebar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,7 +14,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
+import {
+  deleteEndpoint,
+  getMyEndpoints,
+  updateEndpoint,
+  type Endpoint,
+  type UpdateEndpointData,
+} from "@/lib/api";
+import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
+import { Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function MyEndpointsPage() {
   const router = useRouter();
@@ -132,100 +132,101 @@ export default function MyEndpointsPage() {
         <DashboardHeader onToggleSidebar={toggleSidebar} />
         <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
         <main className="flex-1 pt-24 pb-12 px-4 ml-64 transition-all duration-300">
-        <div className="container mx-auto max-w-7xl">
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl md:text-5xl font-bold mb-2">
-                  My Endpoints
-                </h1>
-                <p className="text-xl text-muted-foreground">
-                  Manage your monetized API endpoints
-                </p>
-              </div>
-              <Button onClick={() => {
-                setEditingEndpoint(undefined);
-                setShowAddModal(true);
-              }} variant="hero">
-                Add New Endpoint
-              </Button>
-            </div>
-
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-accent" />
-              </div>
-            ) : endpoints.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground mb-4">
-                  You haven't created any endpoints yet
-                </p>
-                <Button onClick={() => setShowAddModal(true)} variant="hero">
-                  Create Your First Endpoint
+          <div className="container mx-auto max-w-7xl">
+            <div className="space-y-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-2">
+                    My Endpoints
+                  </h1>
+                  <p className="text-xl text-muted-foreground">
+                    Manage your monetized API endpoints
+                  </p>
+                </div>
+                <Button onClick={() => {
+                  setEditingEndpoint(undefined);
+                  setShowAddModal(true);
+                }} size="lg" variant="hero">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Add New Endpoint
                 </Button>
               </div>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {endpoints.map((endpoint, index) => (
-                  <EndpointCard
-                    key={endpoint.id || `endpoint-${index}`}
-                    endpoint={endpoint}
-                    showActions={true}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              </div>
-            )}
+
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-accent" />
+                </div>
+              ) : endpoints.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground mb-4">
+                    You haven't created any endpoints yet
+                  </p>
+                  <Button onClick={() => setShowAddModal(true)} variant="hero">
+                    Create Your First Endpoint
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {endpoints.map((endpoint, index) => (
+                    <EndpointCard
+                      key={endpoint.id || `endpoint-${index}`}
+                      endpoint={endpoint}
+                      showActions={true}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      {showAddModal && (
-        <EndpointFormModal
-          open={showAddModal}
-          onOpenChange={(open) => {
-            setShowAddModal(open);
-            if (!open) setEditingEndpoint(undefined);
-          }}
-          onSubmit={editingEndpoint ? handleUpdateEndpoint : async (data) => {
-            try {
-              const { createEndpoint } = await import("@/lib/api");
-              await createEndpoint(data);
-              toast.success("Endpoint created successfully");
-              await loadEndpoints();
-              setShowAddModal(false);
-            } catch (error: any) {
-              toast.error(error.message || "Failed to create endpoint");
-              throw error;
-            }
-          }}
-          endpoint={editingEndpoint}
-          username={username || ""}
-        />
-      )}
+        {showAddModal && (
+          <EndpointFormModal
+            open={showAddModal}
+            onOpenChange={(open) => {
+              setShowAddModal(open);
+              if (!open) setEditingEndpoint(undefined);
+            }}
+            onSubmit={editingEndpoint ? handleUpdateEndpoint : async (data) => {
+              try {
+                const { createEndpoint } = await import("@/lib/api");
+                await createEndpoint(data);
+                toast.success("Endpoint created successfully");
+                await loadEndpoints();
+                setShowAddModal(false);
+              } catch (error: any) {
+                toast.error(error.message || "Failed to create endpoint");
+                throw error;
+              }
+            }}
+            endpoint={editingEndpoint}
+            username={username || ""}
+          />
+        )}
 
-      <AlertDialog
-        open={!!deletingEndpoint}
-        onOpenChange={(open) => !open && setDeletingEndpoint(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Endpoint</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete "{deletingEndpoint?.name}"? This
-              action cannot be undone and will break all existing integrations
-              using this endpoint.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <AlertDialog
+          open={!!deletingEndpoint}
+          onOpenChange={(open) => !open && setDeletingEndpoint(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Endpoint</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete "{deletingEndpoint?.name}"? This
+                action cannot be undone and will break all existing integrations
+                using this endpoint.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </>
   );

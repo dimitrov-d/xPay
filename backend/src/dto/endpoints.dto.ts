@@ -1,14 +1,6 @@
 import { z } from "zod";
 
-const HTTP_METHODS = [
-  "GET",
-  "POST",
-  "PUT",
-  "DELETE",
-  "PATCH",
-  "HEAD",
-  "OPTIONS",
-] as const;
+const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"] as const;
 
 export const createEndpointSchema = z.object({
   username: z

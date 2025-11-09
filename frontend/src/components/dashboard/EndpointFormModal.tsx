@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +9,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -17,9 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Endpoint, CreateEndpointData, UpdateEndpointData } from "@/lib/api";
-import { useState, useEffect } from "react";
+import { CreateEndpointData, Endpoint, UpdateEndpointData } from "@/lib/api";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface EndpointFormModalProps {
   open: boolean;
@@ -29,7 +29,7 @@ interface EndpointFormModalProps {
   username: string;
 }
 
-const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"];
+const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 
 export function EndpointFormModal({
   open,
