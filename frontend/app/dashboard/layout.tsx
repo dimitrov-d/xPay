@@ -1,6 +1,7 @@
 "use client";
 
-import { Header } from "@/components/landing/Header";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Sidebar } from "@/components/dashboard/Sidebar";
 import { useCurrentUser } from "@coinbase/cdp-hooks";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -25,8 +26,9 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <main className="flex-1 pt-20 pb-12">
+      <DashboardHeader />
+      <Sidebar />
+      <main className="flex-1 pt-20 pb-12 ml-64 transition-all duration-300">
         {children}
       </main>
     </div>

@@ -25,7 +25,7 @@ router.get(
       const [user] = await db
         .select()
         .from(users)
-        .where(eq(users.walletAddress, walletAddress))
+        // .where(eq(users.walletAddress, walletAddress))
         .limit(1);
 
       if (!user) {

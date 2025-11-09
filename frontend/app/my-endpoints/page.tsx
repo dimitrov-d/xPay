@@ -1,6 +1,7 @@
 "use client";
 
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Sidebar } from "@/components/dashboard/Sidebar";
 import { EndpointCard } from "@/components/dashboard/EndpointCard";
 import { EndpointFormModal } from "@/components/dashboard/EndpointFormModal";
 import { Button } from "@/components/ui/button";
@@ -112,7 +113,8 @@ export default function MyEndpointsPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <DashboardHeader />
-      <main className="flex-1 pt-24 pb-12 px-4">
+      <Sidebar />
+      <main className="flex-1 pt-24 pb-12 px-4 ml-64 transition-all duration-300">
         <div className="container mx-auto max-w-7xl">
           <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -127,7 +129,7 @@ export default function MyEndpointsPage() {
               <Button onClick={() => {
                 setEditingEndpoint(undefined);
                 setShowAddModal(true);
-              }}>
+              }} variant="hero">
                 Add New Endpoint
               </Button>
             </div>
@@ -141,15 +143,15 @@ export default function MyEndpointsPage() {
                 <p className="text-muted-foreground mb-4">
                   You haven't created any endpoints yet
                 </p>
-                <Button onClick={() => setShowAddModal(true)}>
+                <Button onClick={() => setShowAddModal(true)} variant="hero">
                   Create Your First Endpoint
                 </Button>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {endpoints.map((endpoint) => (
+                {endpoints.map((endpoint, index) => (
                   <EndpointCard
-                    key={endpoint.id}
+                    key={endpoint.id || `endpoint-${index}`}
                     endpoint={endpoint}
                     showActions={true}
                     onEdit={handleEdit}

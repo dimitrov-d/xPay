@@ -38,16 +38,7 @@ router.get(
       const offset = (page - 1) * limit;
 
       const allEndpoints = await db
-        .select({
-          id: endpoints.id,
-          username: users.username,
-          name: endpoints.name,
-          description: endpoints.description,
-          httpMethod: endpoints.httpMethod,
-          paymentAmount: endpoints.paymentAmount,
-          tokenType: endpoints.tokenType,
-          createdAt: endpoints.createdAt,
-        })
+        .select()
         .from(endpoints)
         .innerJoin(users, eq(endpoints.userWallet, users.walletAddress))
         .limit(limit)

@@ -19,5 +19,8 @@
   "packageManager": "npm@11.6.2",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.15"
   }
 }

@@ -23,7 +23,7 @@ export const DashboardHeader = () => {
       <div className="container mx-auto max-w-7xl px-4">
         <div className="flex items-center justify-between h-16">
           <Link
-            href={currentUser ? "/dashboard" : "/"}
+            href="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
           >
             <Image
@@ -43,7 +43,7 @@ export const DashboardHeader = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full w-10 h-10"
+                    className="rounded-full w-10 h-10 hover:bg-transparent"
                   >
                     <User className="w-5 h-5" />
                   </Button>

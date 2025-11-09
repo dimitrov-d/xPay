@@ -1,17 +1,8 @@
 "use client";
 
-import { Footer } from "@/components/landing/Footer";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
-import { Check, Copy, Loader2, Wallet, AlertTriangle, Save } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { getCurrentUser, updateUsername } from "@/lib/api";
-import { toast } from "sonner";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { Footer } from "@/components/landing/Footer";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +13,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getCurrentUser, updateUsername } from "@/lib/api";
+import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
+import { AlertTriangle, Check, Copy, Loader2, Save, Wallet } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function WalletPage() {
   const router = useRouter();
@@ -93,7 +94,8 @@ export default function WalletPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <DashboardHeader />
-      <main className="flex-1 pt-24 pb-12 px-4">
+      <Sidebar />
+      <main className="flex-1 pt-24 pb-12 px-4 ml-64 transition-all duration-300">
         <div className="container mx-auto max-w-4xl">
           <div className="space-y-8">
             <div className="text-center space-y-4">

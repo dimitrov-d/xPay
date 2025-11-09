@@ -143,7 +143,7 @@ export default function DashboardPage() {
               Browse and discover x402-protected API endpoints
             </p>
           </div>
-          <Button onClick={() => setAddModalOpen(true)} size="lg">
+          <Button onClick={() => setAddModalOpen(true)} size="lg" variant="hero">
             <Plus className="w-5 h-5 mr-2" />
             Add New Endpoint
           </Button>
@@ -204,9 +204,9 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEndpoints.map((endpoint) => (
+            {filteredEndpoints.map((endpoint, index) => (
               <EndpointCard
-                key={endpoint.id}
+                key={endpoint.id || `endpoint-${index}`}
                 endpoint={endpoint}
                 onViewDetails={handleViewDetails}
               />
