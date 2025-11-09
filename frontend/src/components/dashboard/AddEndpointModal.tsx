@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,13 +36,14 @@ import {
 } from "@/components/ui/tooltip";
 import { CreateEndpointData, Endpoint, UpdateEndpointData } from "@/lib/api";
 import { getAuthUser } from "@/lib/auth";
-import { Info, Loader2 } from "lucide-react";
+import { Info, Loader2, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface AddEndpointModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: CreateEndpointData | UpdateEndpointData) => Promise<void>;
+  onDelete?: (endpointId: string) => Promise<void>;
   endpoint?: Endpoint;
   defaultUsername?: string;
 }
@@ -44,10 +55,13 @@ export function AddEndpointModal({
   open,
   onOpenChange,
   onSubmit,
+  onDelete,
   endpoint,
   defaultUsername = "",
 }: AddEndpointModalProps) {
   const [loading, setLoading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [username, setUsername] = useState(defaultUsername);
   const [formData, setFormData] = useState<CreateEndpointData>({
     username: defaultUsername,
@@ -107,8 +121,9 @@ export function AddEndpointModal({
     setLoading(true);
     try {
       if (endpoint) {
-        // Edit mode - submit update data without username
-        const updateData: UpdateEndpointData = {
+        // Edit mode - submit update data with id
+        const updateData: UpdateEndpointData & { id: string } = {
+          id: endpoint.id,
           name: formData.name,
           description: formData.description,
           originalUrl: formData.originalUrl,
@@ -149,7 +164,23 @@ export function AddEndpointModal({
     }
   };
 
+  const handleDelete = async () => {
+    if (!endpoint || !onDelete) return;
+
+    setDeleting(true);
+    try {
+      await onDelete(endpoint.id);
+      setShowDeleteDialog(false);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Failed to delete endpoint:", error);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
+    // @ts-expect-error - React 18/19 type compatibility issue
     <TooltipProvider>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -388,23 +419,66 @@ export function AddEndpointModal({
               />
             </div>
 
-            <div className="flex gap-3 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={loading}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {endpoint ? "Update" : "Create"} Endpoint
-              </Button>
+            <div className="flex gap-3 justify-between items-center">
+              {endpoint && onDelete && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                  disabled={loading}
+                  className="flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete
+                </Button>
+              )}
+              <div className="flex gap-3 justify-end ml-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  <Save className="w-4 h-4 mr-2" />
+                  {endpoint ? "Update" : "Create"} Endpoint
+                </Button>
+              </div>
             </div>
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Endpoint</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div>
+                Are you sure you want to delete "{endpoint?.name}"? This action cannot be undone and will break all existing integrations using this endpoint.
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </TooltipProvider>
   );
 }

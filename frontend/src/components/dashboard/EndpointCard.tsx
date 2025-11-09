@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Endpoint, getProxyUrl } from "@/lib/api";
-import { Code, Copy, Play } from "lucide-react";
+import { Copy, Edit, Play } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { TestEndpointModal } from "./TestEndpointModal";
@@ -99,8 +99,8 @@ export function EndpointCard({ endpoint, onViewDetails }: EndpointCardProps) {
               className="flex-1"
               onClick={() => onViewDetails(endpoint)}
             >
-              <Code className="w-4 h-4 mr-2" />
-              View Details
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
             </Button>
             <Button
               variant="hero"

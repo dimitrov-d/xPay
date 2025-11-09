@@ -3,7 +3,9 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+// @ts-expect-error - React 18/19 type compatibility issue
 const TooltipProvider = ({ delayDuration = 100, ...props }: React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Provider>) => (
+  // @ts-expect-error - React 18/19 type compatibility issue
   <TooltipPrimitive.Provider delayDuration={delayDuration} {...props} />
 );
 
@@ -17,6 +19,8 @@ const TooltipContent = React.forwardRef<
   React.ElementRef<any>,
   React.ComponentPropsWithoutRef<any>
 >(({ className, sideOffset = 4, ...props }, ref) => (
+  // @ts-expect-error - React 18/19 type compatibility issue
+
   <TooltipPortal>
     {/* @ts-expect-error - React 18/19 type compatibility issue */}
     <TooltipPrimitive.Content

@@ -1,7 +1,6 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
@@ -82,18 +81,26 @@ export function MCPServersPanel({ endpoints }: MCPServersPanelProps) {
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 border">
                     <code className="flex-1 text-xs break-all font-mono text-left">{server.mcpUrl}</code>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0 h-7 w-7"
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className="shrink-0 h-7 w-7 flex items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigator.clipboard.writeText(server.mcpUrl);
                         toast.success("MCP Server URL copied to clipboard");
                       }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(server.mcpUrl);
+                          toast.success("MCP Server URL copied to clipboard");
+                        }
+                      }}
                     >
                       <Copy className="w-3.5 h-3.5" />
-                    </Button>
+                    </div>
                   </div>
                 </div>
               </AccordionTrigger>
