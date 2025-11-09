@@ -16,7 +16,12 @@
       "persistent": true
     },
     "lint": {
-      "outputs": []
+      "outputs": [],
+      "dependsOn": ["^lint"]
+    },
+    "format": {
+      "outputs": [],
+      "dependsOn": ["^format"]
     },
     "clean": {
       "cache": false
