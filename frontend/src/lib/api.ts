@@ -153,14 +153,8 @@ export const endpointsApi = {
     if (!response.ok) throw new Error('Failed to fetch endpoints');
     const data = await response.json();
 
-    // Transform nested structure to flat structure
-    const transformedEndpoints: Endpoint[] = data.endpoints.map((item: any) => ({
-      ...item.endpoints,
-      username: item.users?.username || undefined,
-    }));
-
     return {
-      endpoints: transformedEndpoints,
+      endpoints: data.endpoints as Endpoint[],
       pagination: data.pagination,
     };
   },
