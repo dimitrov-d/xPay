@@ -16,7 +16,7 @@ export default function LoginPage() {
   useEffect(() => {
     // Redirect to dashboard if already authenticated with JWT
     if (isAuthenticated() && solanaAddress) {
-      router.push("/wallet");
+      router.push("/profile");
     }
   }, [router, solanaAddress]);
 

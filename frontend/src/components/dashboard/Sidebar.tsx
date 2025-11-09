@@ -40,7 +40,7 @@ export const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
     },
     {
       name: "Wallet & Profile",
-      href: "/wallet",
+      href: "/profile",
       icon: Wallet,
     },
   ];

@@ -102,7 +102,7 @@ export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuItem
-                    onClick={() => router.push("/wallet")}
+                    onClick={() => router.push("/profile")}
                     className="px-4 py-3 cursor-pointer"
                   >
                     <Wallet className="mr-3 h-5 w-5" />
