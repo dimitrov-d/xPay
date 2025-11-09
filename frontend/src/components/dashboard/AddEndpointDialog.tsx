@@ -1,15 +1,14 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSolanaAddress } from "@coinbase/cdp-hooks";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 export function AddEndpointDialog({ onCreated }: { onCreated?: () => void }) {
   const [open, setOpen] = useState(false);
-  const { currentUser } = useCurrentUser();
   const { solanaAddress } = useSolanaAddress();
 
   const [username, setUsername] = useState("");
@@ -24,35 +23,20 @@ export function AddEndpointDialog({ onCreated }: { onCreated?: () => void }) {
   const [sampleResponse, setSampleResponse] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const meQuery = useQuery({
-    queryKey: ["me", solanaAddress],
-    queryFn: async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/users/me`, {
-        headers: {
-          "content-type": "application/json",
-          ...(solanaAddress ? { "x-wallet-address": solanaAddress } : {}),
-        },
-      });
-      if (!res.ok) throw new Error("Failed to load profile");
-      return res.json() as Promise<{ username: string }>;
-    },
-    enabled: open && !!currentUser && !!solanaAddress,
-    onSuccess: (me) => setUsername((prev) => prev || me.username || ""),
-  });
-
   useEffect(() => {
-    if (!open) {
-      setName("");
-      setDescription("");
-      setOriginalUrl("");
-      setHttpMethod("GET");
-      setPaymentAmount("0");
-      setTokenType("USDC");
-      setCustomAuthHeaders("");
-      setSampleBody("");
-      setSampleResponse("");
-      setError(null);
+    if (open) {
+      return;
     }
+    setName("");
+    setDescription("");
+    setOriginalUrl("");
+    setHttpMethod("GET");
+    setPaymentAmount("0");
+    setTokenType("USDC");
+    setCustomAuthHeaders("");
+    setSampleBody("");
+    setSampleResponse("");
+    setError(null);
   }, [open]);
 
   const createMutation = useMutation({
@@ -88,7 +72,7 @@ export function AddEndpointDialog({ onCreated }: { onCreated?: () => void }) {
         sampleBody: bodyObj,
         sampleResponse: responseObj,
       };
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/endpoints`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/endpoints`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -114,9 +98,12 @@ export function AddEndpointDialog({ onCreated }: { onCreated?: () => void }) {
   return (
     <>
       <Button onClick={() => setOpen(true)}>Add New Endpoint</Button>
+      {/* @ts-expect-error - React 18/19 type compatibility issue with Next.js 15 */}
       <Dialog open={open} onOpenChange={setOpen}>
+        {/* @ts-expect-error - React 18/19 type compatibility issue */}
         <DialogContent className="max-w-2xl">
           <DialogHeader>
+            {/* @ts-expect-error - React 18/19 type compatibility issue */}
             <DialogTitle>Add New Endpoint</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">

@@ -17,9 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getCurrentUser, updateUsername } from "@/lib/api";
+import { updateUsername } from "@/lib/api";
 import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
-import { Connection, LAMPORTS_PER_SOL, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { AlertTriangle, Check, Copy, Loader2, Save, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -46,50 +45,45 @@ export default function WalletPage() {
       return;
     }
     loadUser();
-    loadBalances();
   }, [currentUser, router, solanaAddress]);
 
   const loadUser = async () => {
     if (!solanaAddress) return;
     try {
       setLoading(true);
-      const user = await getCurrentUser(solanaAddress);
-      setUsername(user.username);
-      setNewUsername(user.username);
-    } catch (error) {
-      console.log("User not found");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  const loadBalances = async () => {
-    if (!solanaAddress) return;
-    try {
       setLoadingBalances(true);
 
-      const connection = new Connection(clusterApiUrl("mainnet-beta"));
-      const publicKey = new PublicKey(solanaAddress);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${apiUrl}/user/profile`, {
+        headers: {
+          "content-type": "application/json",
+          "x-wallet-address": solanaAddress,
+        },
+      });
 
-      const solLamports = await connection.getBalance(publicKey);
-      setSolBalance(solLamports / LAMPORTS_PER_SOL);
+      if (!response.ok) {
+        throw new Error("Failed to load user");
+      }
 
-      const usdcMint = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, { mint: usdcMint });
+      const user = await response.json();
+      setUsername(user.username);
+      setNewUsername(user.username);
 
-      if (tokenAccounts.value.length > 0) {
-        const balance =
-          tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount;
-        setUsdcBalance(balance);
+      // Set balances from response
+      if (user.balances) {
+        setSolBalance(user.balances.sol || 0);
+        setUsdcBalance(user.balances.usdc || 0);
       } else {
+        setSolBalance(0);
         setUsdcBalance(0);
       }
-    } catch (error) {
-      console.error("Failed to load balances:", error);
+    } catch (error: any) {
+      console.error("Failed to load user:", error);
+      toast.error(`Failed to load user: ${error.message || "Unknown error"}`);
       setSolBalance(0);
       setUsdcBalance(0);
     } finally {
+      setLoading(false);
       setLoadingBalances(false);
     }
   };

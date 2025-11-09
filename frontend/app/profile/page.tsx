@@ -1,14 +1,14 @@
 "use client";
 
-import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
+import { Header } from "@/components/landing/Header";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type MeResponse = {
   walletAddress: string;
@@ -31,7 +31,7 @@ export default function ProfilePage() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["me", solanaAddress],
     queryFn: async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/users/me`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile`, {
         headers: {
           "content-type": "application/json",
           ...(solanaAddress ? { "x-wallet-address": solanaAddress } : {}),
@@ -44,14 +44,11 @@ export default function ProfilePage() {
       return res.json() as Promise<MeResponse>;
     },
     enabled: !!currentUser && !!solanaAddress,
-    onSuccess: (me) => {
-      setUsername(me.username);
-    },
   });
 
   const updateMutation = useMutation({
     mutationFn: async (newUsername: string) => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/users/username`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/username`, {
         method: "PUT",
         headers: {
           "content-type": "application/json",

@@ -1,11 +1,11 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { EndpointDetail, fetchJson } from "@/lib/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCurrentUser, useSolanaAddress } from "@coinbase/cdp-hooks";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 export function EditEndpointDialog({
@@ -85,7 +85,7 @@ export function EditEndpointDialog({
         sampleBody: bodyObj,
         sampleResponse: responseObj,
       };
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/endpoints/${endpointId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/endpoints/${endpointId}`, {
         method: "PUT",
         headers: {
           "content-type": "application/json",
@@ -93,6 +93,7 @@ export function EditEndpointDialog({
         },
         body: JSON.stringify(payload),
       });
+
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error || "Failed to update endpoint");
@@ -108,8 +109,10 @@ export function EditEndpointDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* @ts-expect-error - React 18/19 type compatibility issue */}
       <DialogContent className="max-w-2xl">
         <DialogHeader>
+          {/* @ts-expect-error - React 18/19 type compatibility issue */}
           <DialogTitle>Edit Endpoint</DialogTitle>
         </DialogHeader>
         {isLoading && <div className="text-sm text-muted-foreground">Loading...</div>}

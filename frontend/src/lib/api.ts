@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface Endpoint {
   id: string;
@@ -22,6 +22,10 @@ export interface User {
   username: string;
   createdAt: string;
   updatedAt: string;
+  balances?: {
+    sol: number;
+    usdc: number;
+  };
 }
 
 export interface PaginatedEndpoints {
@@ -81,13 +85,15 @@ export const endpointsApi = {
     );
     if (!response.ok) throw new Error("Failed to fetch endpoints");
     const data = await response.json();
-    
+
     // Transform nested structure to flat structure
-    const transformedEndpoints: Endpoint[] = data.endpoints.map((item: any) => ({
-      ...item.endpoints,
-      username: item.users?.username || undefined,
-    }));
-    
+    const transformedEndpoints: Endpoint[] = data.endpoints.map(
+      (item: any) => ({
+        ...item.endpoints,
+        username: item.users?.username || undefined,
+      })
+    );
+
     return {
       endpoints: transformedEndpoints,
       pagination: data.pagination,
@@ -110,19 +116,20 @@ export const endpointsApi = {
     );
     if (!response.ok) throw new Error("Failed to fetch user endpoints");
     const data = await response.json();
-    
+
     // If endpoints don't have username, fetch it from user profile
-    if (data.endpoints && data.endpoints.length > 0 && !data.endpoints[0].username) {
+    if (
+      data.endpoints &&
+      data.endpoints.length > 0 &&
+      !data.endpoints[0].username
+    ) {
       try {
-        const userResponse = await fetch(
-          `${API_BASE_URL}/user/profile`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "x-wallet-address": walletAddress,
-            },
-          }
-        );
+        const userResponse = await fetch(`${API_BASE_URL}/user/profile`, {
+          headers: {
+            "Content-Type": "application/json",
+            "x-wallet-address": walletAddress,
+          },
+        });
         if (userResponse.ok) {
           const userData = await userResponse.json();
           data.endpoints = data.endpoints.map((endpoint: Endpoint) => ({
@@ -134,7 +141,7 @@ export const endpointsApi = {
         console.error("Failed to fetch username for endpoints:", error);
       }
     }
-    
+
     return data;
   },
 
