@@ -228,56 +228,72 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Test Endpoint</DialogTitle>
-          <DialogDescription>
-            Test this endpoint by making an x402 payment. You'll need to sign a transaction with
-            your wallet.
+          <DialogTitle className="text-lg sm:text-xl">Test Endpoint</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
+            Test this endpoint by making an x402 payment. You'll need to sign a
+            transaction with your wallet.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           <div className="rounded-lg border">
             <button
               type="button"
               onClick={() => setIsEndpointDetailsOpen(!isEndpointDetailsOpen)}
-              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+              className="w-full flex items-center justify-between p-3 sm:p-4 hover:bg-muted/50 transition-colors"
             >
-              <Label className="text-sm font-semibold">Endpoint Details & Wallet</Label>
+              <Label className="text-xs sm:text-sm font-semibold">
+                Endpoint Details & Wallet
+              </Label>
               {isEndpointDetailsOpen ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
               )}
             </button>
             {isEndpointDetailsOpen && (
-              <div className="px-4 pb-4 space-y-4">
-                <div className="grid grid-cols-3 gap-4 p-3 rounded-lg border bg-muted/50">
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Endpoint URL</Label>
-                    <p className="text-xs font-mono mt-1 break-all">{getProxyUrl(endpoint.username || "", endpoint.name)}</p>
+              <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg border bg-muted/50">
+                  <div className="min-w-0">
+                    <Label className="text-xs text-muted-foreground">
+                      Endpoint URL
+                    </Label>
+                    <p className="text-xs font-mono mt-1 break-all">
+                      {getProxyUrl(endpoint.username || "", endpoint.name)}
+                    </p>
                   </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Provider</Label>
-                    <p className="text-sm mt-1">@{endpoint.username || "unknown"}</p>
+                  <div className="min-w-0">
+                    <Label className="text-xs text-muted-foreground">
+                      Provider
+                    </Label>
+                    <p className="text-xs sm:text-sm mt-1 truncate">
+                      @{endpoint.username || "unknown"}
+                    </p>
                   </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Description</Label>
-                    <p className="text-sm mt-1 line-clamp-2">{endpoint.description}</p>
+                  <div className="min-w-0">
+                    <Label className="text-xs text-muted-foreground">
+                      Description
+                    </Label>
+                    <p className="text-xs sm:text-sm mt-1 line-clamp-2">
+                      {endpoint.description}
+                    </p>
                   </div>
                 </div>
-                <div className="rounded-lg border p-4 bg-muted/50">
+                <div className="rounded-lg border p-3 sm:p-4 bg-muted/50">
                   <div className="flex items-center gap-2">
-                    <Wallet className="h-5 w-5 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Wallet</p>
+                    <Wallet className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm font-medium">Wallet</p>
                       {solanaAddress ? (
-                        <p className="text-xs text-muted-foreground font-mono">
+                        <p className="text-xs text-muted-foreground font-mono truncate">
                           {solanaAddress.slice(0, 8)}...{solanaAddress.slice(-8)}
                         </p>
                       ) : (
-                        <p className="text-xs text-red-500">No wallet connected</p>
+                        <p className="text-xs text-red-500">
+                          No wallet connected
+                        </p>
                       )}
                     </div>
                   </div>
@@ -290,21 +306,25 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             <button
               type="button"
               onClick={() => setIsQueryBodyOpen(!isQueryBodyOpen)}
-              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+              className="w-full flex items-center justify-between p-3 sm:p-4 hover:bg-muted/50 transition-colors"
             >
-              <Label className="text-sm font-semibold">
-                {endpoint.httpMethod === "GET" ? "Query Parameters" : "Query Parameters & Body"}
+              <Label className="text-xs sm:text-sm font-semibold">
+                {endpoint.httpMethod === "GET"
+                  ? "Query Parameters"
+                  : "Query Parameters & Body"}
               </Label>
               {isQueryBodyOpen ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
               )}
             </button>
             {isQueryBodyOpen && (
-              <div className="px-4 pb-4 space-y-4">
+              <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-3 sm:space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="query-params">Query Parameters (JSON)</Label>
+                  <Label htmlFor="query-params" className="text-xs sm:text-sm">
+                    Query Parameters (JSON)
+                  </Label>
                   <Textarea
                     id="query-params"
                     placeholder='{"page": 1, "limit": 10}'
@@ -317,7 +337,9 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
 
                 {endpoint.httpMethod !== "GET" && (
                   <div className="space-y-2">
-                    <Label htmlFor="body">Request Body (JSON)</Label>
+                    <Label htmlFor="body" className="text-xs sm:text-sm">
+                      Request Body (JSON)
+                    </Label>
                     <Textarea
                       id="body"
                       placeholder='{"key": "value"}'
@@ -336,17 +358,19 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             <button
               type="button"
               onClick={() => setIsHeadersOpen(!isHeadersOpen)}
-              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+              className="w-full flex items-center justify-between p-3 sm:p-4 hover:bg-muted/50 transition-colors"
             >
-              <Label className="text-sm font-semibold">Custom Headers</Label>
+              <Label className="text-xs sm:text-sm font-semibold">
+                Custom Headers
+              </Label>
               {isHeadersOpen ? (
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
               )}
             </button>
             {isHeadersOpen && (
-              <div className="px-4 pb-4 space-y-2">
+              <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-2">
                 <Textarea
                   id="headers"
                   placeholder='{"Authorization": "Bearer token", "X-Custom-Header": "value"}'
@@ -363,18 +387,22 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
             <div className="rounded-lg border">
               <button
                 type="button"
-                onClick={() => setIsSampleResponseOpen(!isSampleResponseOpen)}
-                className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                onClick={() =>
+                  setIsSampleResponseOpen(!isSampleResponseOpen)
+                }
+                className="w-full flex items-center justify-between p-3 sm:p-4 hover:bg-muted/50 transition-colors"
               >
-                <Label className="text-sm font-semibold">Sample Response (Expected)</Label>
+                <Label className="text-xs sm:text-sm font-semibold">
+                  Sample Response (Expected)
+                </Label>
                 {isSampleResponseOpen ? (
-                  <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                  <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
                 )}
               </button>
               {isSampleResponseOpen && (
-                <div className="px-4 pb-4">
+                <div className="px-3 sm:px-4 pb-3 sm:pb-4">
                   <div className="rounded-md border">
                     <JsonViewer data={endpoint.sampleResponse} />
                   </div>
@@ -384,18 +412,19 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
           )}
 
           {paymentDetails && (
-            <div className="rounded-lg border p-4 bg-blue-50 dark:bg-blue-950/20">
+            <div className="rounded-lg border p-3 sm:p-4 bg-blue-50 dark:bg-blue-950/20">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-blue-900 dark:text-blue-100">
                     Payment Required
                   </p>
-                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-1 break-words">
                     {paymentDetails.description}
                   </p>
                   <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                    Amount: {Number(paymentDetails.maxAmountRequired) / 10 ** 6} USDC
+                    Amount:{" "}
+                    {Number(paymentDetails.maxAmountRequired) / 10 ** 6} USDC
                   </p>
                 </div>
               </div>
@@ -403,37 +432,43 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
           )}
 
           {step !== "idle" && (
-            <div className="flex items-center gap-2 p-4 rounded-lg border">
+            <div className="flex items-center gap-2 p-3 sm:p-4 rounded-lg border">
               {step === "requesting" && (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-                  <span className="text-sm">Requesting payment details...</span>
+                  <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-blue-500 shrink-0" />
+                  <span className="text-xs sm:text-sm">
+                    Requesting payment details...
+                  </span>
                 </>
               )}
               {step === "signing" && (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin text-yellow-500" />
-                  <span className="text-sm">Please sign the transaction in your wallet...</span>
+                  <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-yellow-500 shrink-0" />
+                  <span className="text-xs sm:text-sm">
+                    Please sign the transaction in your wallet...
+                  </span>
                 </>
               )}
               {step === "executing" && (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin text-green-500" />
-                  <span className="text-sm">Executing endpoint...</span>
+                  <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-green-500 shrink-0" />
+                  <span className="text-xs sm:text-sm">
+                    Executing endpoint...
+                  </span>
                 </>
               )}
               {step === "success" && (
                 <>
-                  <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <span className="text-sm text-green-600 dark:text-green-400">
+                  <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 shrink-0" />
+                  <span className="text-xs sm:text-sm text-green-600 dark:text-green-400">
                     Success! Endpoint executed.
                   </span>
                 </>
               )}
               {step === "error" && (
                 <>
-                  <XCircle className="h-5 w-5 text-red-500" />
-                  <span className="text-sm text-red-600 dark:text-red-400">
+                  <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 shrink-0" />
+                  <span className="text-xs sm:text-sm text-red-600 dark:text-red-400 break-words">
                     Error: {error}
                   </span>
                 </>
@@ -443,36 +478,59 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
 
           {result && (
             <div className="space-y-2">
-              <h3 className="text-sm font-semibold">Response:</h3>
+              <h3 className="text-xs sm:text-sm font-semibold">Response:</h3>
               <JsonViewer data={result} />
             </div>
           )}
 
           {error && step === "error" && (
-            <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-950/20 p-4">
+            <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-950/20 p-3 sm:p-4">
               <div className="flex items-start gap-2">
-                <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-red-900 dark:text-red-100">Error</p>
-                  <p className="text-xs text-red-700 dark:text-red-300 mt-1">{error}</p>
+                <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-red-900 dark:text-red-100">
+                    Error
+                  </p>
+                  <p className="text-xs text-red-700 dark:text-red-300 mt-1 break-words">
+                    {error}
+                  </p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={handleClose} disabled={step === "requesting" || step === "signing" || step === "executing"}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3 sm:pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={
+                step === "requesting" ||
+                step === "signing" ||
+                step === "executing"
+              }
+              className="w-full sm:w-auto text-sm"
+            >
               {step === "idle" ? "Cancel" : "Close"}
             </Button>
             {step === "idle" && (
-              <Button variant="hero" onClick={handleTest} disabled={!solanaAddress}>
-                <Play className="w-4 h-4 mr-2" />
+              <Button
+                variant="hero"
+                onClick={handleTest}
+                disabled={!solanaAddress}
+                className="w-full sm:w-auto text-sm"
+              >
+                <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 Execute
               </Button>
             )}
             {(step === "error" || step === "success") && (
-              <Button variant="hero" onClick={handleTest} disabled={!solanaAddress}>
-                <Play className="w-4 h-4 mr-2" />
+              <Button
+                variant="hero"
+                onClick={handleTest}
+                disabled={!solanaAddress}
+                className="w-full sm:w-auto text-sm"
+              >
+                <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 Try Again
               </Button>
             )}

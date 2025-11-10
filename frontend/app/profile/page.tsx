@@ -38,7 +38,7 @@ export default function ProfilePage() {
   const [showWarning, setShowWarning] = useState(false);
   const [showExportConfirmation, setShowExportConfirmation] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [solBalance, setSolBalance] = useState<number | null>(null);
   const [usdcBalance, setUsdcBalance] = useState<number | null>(null);
   const [loadingBalances, setLoadingBalances] = useState(true);
@@ -53,6 +53,20 @@ export default function ProfilePage() {
       loadUser();
     }
   }, [currentUser, router, solanaAddress, isReady]);
+
+  // Initialize sidebar state based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      // On mobile (< 1024px), always start collapsed
+      if (window.innerWidth < 1024) {
+        setSidebarCollapsed(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const loadUser = async () => {
     try {
@@ -166,14 +180,18 @@ export default function ProfilePage() {
       <div className="min-h-screen flex flex-col">
         <DashboardHeader onToggleSidebar={toggleSidebar} />
         <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
-        <main className="flex-1 pt-24 pb-12 px-4 ml-64 transition-all duration-300">
-          <div className="container mx-auto max-w-4xl">
-            <div className="space-y-8">
-              <div className="text-center space-y-4">
-                <h1 className="text-4xl md:text-5xl font-bold">
+        <main
+          className={`flex-1 pt-20 pb-12 transition-all duration-300 ${
+            sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+          }`}
+        >
+          <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <div className="space-y-6 sm:space-y-8">
+              <div className="text-center space-y-2 sm:space-y-4">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
                   Wallet & Profile
                 </h1>
-                <p className="text-xl text-muted-foreground">
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground">
                   Manage your wallet and profile settings
                 </p>
               </div>
@@ -181,13 +199,15 @@ export default function ProfilePage() {
               {/* Wallet Balances */}
               <Card className="shadow-elegant">
                 <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-full bg-accent/10">
-                      <Wallet className="w-6 h-6 text-accent" />
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="p-2 sm:p-3 rounded-full bg-accent/10 flex-shrink-0">
+                      <Wallet className="w-5 h-5 sm:w-6 sm:h-6 text-accent" />
                     </div>
-                    <div>
-                      <CardTitle>Solana Wallet Address</CardTitle>
-                      <CardDescription>
+                    <div className="flex-1">
+                      <CardTitle className="text-base sm:text-lg">
+                        Solana Wallet Address
+                      </CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">
                         Your SVM (Solana Virtual Machine) wallet address
                       </CardDescription>
                     </div>
@@ -196,33 +216,34 @@ export default function ProfilePage() {
                 <CardContent className="space-y-4">
                   {solanaAddress ? (
                     <>
-                      <div className="flex items-center gap-2 p-4 rounded-lg bg-muted border border-border">
-                        <code className="flex-1 text-sm font-mono break-all">
+                      <div className="flex items-center gap-2 p-3 sm:p-4 rounded-lg bg-muted border border-border">
+                        <code className="flex-1 text-xs sm:text-sm font-mono break-all">
                           {solanaAddress}
                         </code>
                         <Button
                           variant="outline"
                           size="icon"
                           onClick={handleCopy}
-                          className="shrink-0"
+                          className="shrink-0 h-8 w-8 sm:h-10 sm:w-10"
                         >
                           {copied ? (
-                            <Check className="w-4 h-4 text-green-500" />
+                            <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
                           ) : (
-                            <Copy className="w-4 h-4" />
+                            <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                           )}
                         </Button>
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-xs sm:text-sm text-muted-foreground">
                         <p>
-                          This is your embedded Solana wallet address. You can use this address to receive SOL and other SPL tokens.
+                          This is your embedded Solana wallet address. You can
+                          use this address to receive SOL and other SPL tokens.
                         </p>
                       </div>
                     </>
                   ) : (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="w-6 h-6 animate-spin text-accent" />
-                      <span className="ml-2 text-muted-foreground">
+                      <span className="ml-2 text-xs sm:text-sm text-muted-foreground">
                         Loading wallet address...
                       </span>
                     </div>
@@ -230,51 +251,73 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Card className="shadow-elegant">
                   <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-full bg-accent/10">
-                        <img src="/solana.svg" alt="Solana" className="w-6 h-6" />
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="p-2 sm:p-3 rounded-full bg-accent/10 flex-shrink-0">
+                        <img
+                          src="/solana.svg"
+                          alt="Solana"
+                          className="w-5 h-5 sm:w-6 sm:h-6"
+                        />
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">SOL Balance</CardTitle>
-                        <CardDescription>Your Solana balance</CardDescription>
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base sm:text-lg">
+                          SOL Balance
+                        </CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
+                          Your Solana balance
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     {loadingBalances ? (
                       <div className="flex items-center gap-2">
-                        <Loader2 className="w-5 h-5 animate-spin text-accent" />
-                        <span className="text-muted-foreground">Loading...</span>
+                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-accent" />
+                        <span className="text-xs sm:text-sm text-muted-foreground">
+                          Loading...
+                        </span>
                       </div>
                     ) : (
-                      <p className="text-xl font-bold">{solBalance?.toFixed(4) || "0.0000"} SOL</p>
+                      <p className="text-lg sm:text-xl font-bold break-all">
+                        {solBalance?.toFixed(4) || "0.0000"} SOL
+                      </p>
                     )}
                   </CardContent>
                 </Card>
 
                 <Card className="shadow-elegant">
                   <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-950">
-                        <img src="/usdc.svg" alt="USDC" className="w-8 h-8" />
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="p-2 sm:p-3 rounded-full bg-blue-100 dark:bg-blue-950 flex-shrink-0">
+                        <img
+                          src="/usdc.svg"
+                          alt="USDC"
+                          className="w-6 h-6 sm:w-8 sm:h-8"
+                        />
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">USDC Balance</CardTitle>
-                        <CardDescription>Your USDC balance</CardDescription>
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base sm:text-lg">
+                          USDC Balance
+                        </CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
+                          Your USDC balance
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     {loadingBalances ? (
                       <div className="flex items-center gap-2">
-                        <Loader2 className="w-5 h-5 animate-spin text-accent" />
-                        <span className="text-muted-foreground">Loading...</span>
+                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-accent" />
+                        <span className="text-xs sm:text-sm text-muted-foreground">
+                          Loading...
+                        </span>
                       </div>
                     ) : (
-                      <p className="text-xl font-bold text-green-600 dark:text-green-500">
+                      <p className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-500 break-all">
                         {usdcBalance?.toFixed(2) || "0.00"} USDC
                       </p>
                     )}
@@ -284,9 +327,10 @@ export default function ProfilePage() {
 
               <Card className="shadow-elegant">
                 <CardHeader>
-                  <CardTitle>Username</CardTitle>
-                  <CardDescription>
-                    Your username is used in proxy URLs. Changing it will break existing endpoints.
+                  <CardTitle className="text-base sm:text-lg">Username</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">
+                    Your username is used in proxy URLs. Changing it will break
+                    existing endpoints.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -297,13 +341,16 @@ export default function ProfilePage() {
                   ) : (
                     <>
                       <div className="space-y-2">
-                        <Label htmlFor="username">Username</Label>
+                        <Label htmlFor="username" className="text-sm">
+                          Username
+                        </Label>
                         <Input
                           id="username"
                           value={newUsername}
                           onChange={(e) => setNewUsername(e.target.value)}
                           pattern="^[a-zA-Z0-9_-]+$"
                           placeholder="your-username"
+                          className="text-sm"
                         />
                         <p className="text-xs text-muted-foreground">
                           Only letters, numbers, hyphens, and underscores
@@ -311,20 +358,27 @@ export default function ProfilePage() {
                       </div>
                       {newUsername !== username && (
                         <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                          <AlertTriangle className="w-5 h-5 text-yellow-500 mt-0.5 shrink-0" />
-                          <div className="text-sm text-yellow-600 dark:text-yellow-400">
-                            <p className="font-semibold mb-1">Warning: Not Backwards Compatible</p>
+                          <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 mt-0.5 shrink-0" />
+                          <div className="text-xs sm:text-sm text-yellow-600 dark:text-yellow-400">
+                            <p className="font-semibold mb-1">
+                              Warning: Not Backwards Compatible
+                            </p>
                             <p>
-                              Changing your username will cause all existing proxy URLs to change.
-                              Old endpoints will stop working and you'll need to update all integrations.
+                              Changing your username will cause all existing
+                              proxy URLs to change. Old endpoints will stop
+                              working and you'll need to update all
+                              integrations.
                             </p>
                           </div>
                         </div>
                       )}
                       <Button
                         onClick={handleUsernameChange}
-                        disabled={newUsername === username || !newUsername || saving}
+                        disabled={
+                          newUsername === username || !newUsername || saving
+                        }
                         variant="hero"
+                        className="w-full sm:w-auto"
                       >
                         {saving ? (
                           <>
@@ -346,23 +400,25 @@ export default function ProfilePage() {
               {/* Wallet Export */}
               <Card className="shadow-elegant border-red-500/50">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                    <AlertTriangle className="h-5 w-5" />
+                  <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400 text-base sm:text-lg">
+                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
                     Wallet Export
                   </CardTitle>
-                  <CardDescription>Export your wallet private key (high-risk operation)</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">
+                    Export your wallet private key (high-risk operation)
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Button
                     variant="destructive"
                     onClick={handleExportRequest}
                     disabled={!solanaAddress}
-                    className="w-1/2 mx-auto"
+                    className="w-full sm:w-auto mx-auto"
                   >
                     Export Private Key
                   </Button>
                   {!solanaAddress && (
-                    <p className="text-sm text-muted-foreground text-center">
+                    <p className="text-xs sm:text-sm text-muted-foreground text-center">
                       Connect your wallet to export your private key.
                     </p>
                   )}

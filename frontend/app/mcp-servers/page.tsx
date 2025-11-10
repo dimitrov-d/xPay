@@ -19,7 +19,7 @@ export default function MCPServersPage() {
   const [filteredEndpoints, setFilteredEndpoints] = useState<Endpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   useEffect(() => {
     if (!currentUser) {
@@ -27,6 +27,20 @@ export default function MCPServersPage() {
       return;
     }
   }, [currentUser, router]);
+
+  // Initialize sidebar state based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      // On mobile (< 1024px), always start collapsed
+      if (window.innerWidth < 1024) {
+        setSidebarCollapsed(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchEndpoints = async () => {
@@ -72,17 +86,23 @@ export default function MCPServersPage() {
     <div className="min-h-screen flex flex-col">
       <DashboardHeader onToggleSidebar={toggleSidebar} />
       <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
-      <main className="flex-1 pt-24 pb-12 px-4 ml-64 transition-all duration-300">
-        <div className="container mx-auto max-w-7xl">
-          <div className="space-y-8">
+      <main
+        className={`flex-1 pt-20 pb-12 transition-all duration-300 ${
+          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+        }`}
+      >
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="space-y-6 sm:space-y-8">
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-lg bg-primary/10">
-                  <Server className="w-8 h-8 text-primary" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <div className="p-2 sm:p-3 rounded-lg bg-primary/10 flex-shrink-0">
+                  <Server className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
                 </div>
-                <div>
-                  <h1 className="text-4xl font-bold">MCP Servers</h1>
-                  <p className="text-muted-foreground mt-1">
+                <div className="flex-1">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+                    MCP Servers
+                  </h1>
+                  <p className="text-muted-foreground mt-1 text-sm sm:text-base">
                     Browse and connect to MCP-compatible servers
                   </p>
                 </div>

@@ -71,32 +71,44 @@ export function EndpointCard({ endpoint, onViewDetails, showEarnings = false }: 
 
   return (
     <>
-      <Card className="shadow-elegant hover:shadow-xl transition-shadow duration-300">
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-xl mb-2">{endpoint.name}</CardTitle>
-              <CardDescription>{endpoint.description}</CardDescription>
+      <Card className="shadow-elegant hover:shadow-xl transition-shadow duration-300 flex flex-col">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg sm:text-xl mb-2 break-words">
+                {endpoint.name}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm line-clamp-2">
+                {endpoint.description}
+              </CardDescription>
               {endpoint.averageRating !== undefined && (
-                <div className="flex items-center gap-1 mt-2">
+                <div className="flex items-center gap-1 mt-2 flex-wrap">
                   {renderStars(endpoint.averageRating)}
                   <span className="text-xs text-muted-foreground ml-1">
-                    ({endpoint.averageRating.toFixed(1)} • {endpoint.totalReviews} {endpoint.totalReviews === 1 ? 'review' : 'reviews'})
+                    ({endpoint.averageRating.toFixed(1)} •{" "}
+                    {endpoint.totalReviews}{" "}
+                    {endpoint.totalReviews === 1 ? "review" : "reviews"})
                   </span>
                 </div>
               )}
             </div>
-            <Badge className={`ml-2 ${getMethodColor(endpoint.httpMethod)}`}>
+            <Badge
+              className={`ml-2 shrink-0 text-xs ${getMethodColor(
+                endpoint.httpMethod
+              )}`}
+            >
               {endpoint.httpMethod}
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
+        <CardContent className="space-y-3 sm:space-y-4 flex-1 flex flex-col">
+          <div className="space-y-2 flex-1">
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">Proxy URL:</p>
               <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 border">
-                <code className="flex-1 text-xs break-all">{proxyUrl}</code>
+                <code className="flex-1 text-xs break-all overflow-hidden">
+                  {proxyUrl}
+                </code>
                 {endpoint.username && (
                   <Button
                     variant="ghost"
@@ -113,8 +125,8 @@ export function EndpointCard({ endpoint, onViewDetails, showEarnings = false }: 
               </div>
             </div>
 
-            <div className="pt-3 mt-4">
-              <div className="flex items-center justify-between">
+            <div className="pt-2 sm:pt-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">Price:</span>
                   <div className="flex items-center gap-1">
@@ -122,29 +134,41 @@ export function EndpointCard({ endpoint, onViewDetails, showEarnings = false }: 
                       src="/usdc.svg"
                       alt="USDC"
                       className="w-4 h-4"
-                      style={{ display: "inline-block", verticalAlign: "middle" }}
+                      style={{
+                        display: "inline-block",
+                        verticalAlign: "middle",
+                      }}
                     />
-                    <span className="font-bold text-green-600 dark:text-green-500">
+                    <span className="font-bold text-sm sm:text-base text-green-600 dark:text-green-500">
                       {endpoint.paymentAmount}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-muted-foreground">Provider:</span>
-                  <span className="text-sm font-medium">@{endpoint.username || "unknown"}</span>
+                  <span className="text-xs text-muted-foreground">
+                    Provider:
+                  </span>
+                  <span className="text-xs sm:text-sm font-medium truncate">
+                    @{endpoint.username || "unknown"}
+                  </span>
                 </div>
               </div>
               {showEarnings && endpoint.totalEarnings !== undefined && (
                 <div className="flex items-center gap-2 mt-3 pt-3 border-t">
-                  <span className="text-xs text-muted-foreground">Total Earnings:</span>
+                  <span className="text-xs text-muted-foreground">
+                    Total Earnings:
+                  </span>
                   <div className="flex items-center gap-1">
                     <img
                       src="/usdc.svg"
                       alt="USDC"
-                      className="w-5 h-5"
-                      style={{ display: "inline-block", verticalAlign: "middle" }}
+                      className="w-4 h-4 sm:w-5 sm:h-5"
+                      style={{
+                        display: "inline-block",
+                        verticalAlign: "middle",
+                      }}
                     />
-                    <span className="font-bold text-xl text-green-600 dark:text-green-500">
+                    <span className="font-bold text-lg sm:text-xl text-green-600 dark:text-green-500">
                       {parseFloat(endpoint.totalEarnings).toFixed(4)}
                     </span>
                   </div>
@@ -153,23 +177,23 @@ export function EndpointCard({ endpoint, onViewDetails, showEarnings = false }: 
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 text-sm"
               onClick={() => onViewDetails(endpoint)}
             >
-              <Edit className="w-4 h-4 mr-2" />
+              <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               Edit
             </Button>
             <Button
               variant="hero"
-              className="flex-1"
+              className="flex-1 text-sm"
               onClick={() => setTestModalOpen(true)}
             >
-              <Play className="w-4 h-4 mr-2" />
-              Test
-              <span className="ml-2 text-xs opacity-90">
+              <Play className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span>Test</span>
+              <span className="ml-1 sm:ml-2 text-xs opacity-90 hidden sm:inline">
                 ({endpoint.paymentAmount} USDC)
               </span>
             </Button>

@@ -131,36 +131,44 @@ export default function DashboardPage() {
   const httpMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"];
 
   return (
-    <div className="container mx-auto max-w-7xl px-8 py-8">
-      <div className="space-y-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-4xl font-bold">xPay Endpoint Marketplace</h1>
-            <p className="text-muted-foreground mt-2">
+    <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+          <div className="flex-1">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+              xPay Endpoint Marketplace
+            </h1>
+            <p className="text-muted-foreground mt-1 sm:mt-2 text-sm sm:text-base">
               Browse and discover x402-protected API endpoints
             </p>
           </div>
-          <div className="mr-8">
-            <Button onClick={() => setAddModalOpen(true)} size="lg" variant="hero">
-              <Plus className="w-5 h-5 mr-2" />
-              Add New Endpoint
+          <div className="flex-shrink-0">
+            <Button
+              onClick={() => setAddModalOpen(true)}
+              size="lg"
+              variant="hero"
+              className="w-full sm:w-auto"
+            >
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              <span className="hidden sm:inline">Add New Endpoint</span>
+              <span className="sm:hidden">Add Endpoint</span>
             </Button>
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative max-w-md">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <div className="relative flex-1 sm:max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               placeholder="Search endpoints..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-80"
+              className="pl-10 w-full"
             />
           </div>
 
           <Select value={filterMethod} onValueChange={setFilterMethod}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by method" />
             </SelectTrigger>
             <SelectContent>
@@ -174,7 +182,7 @@ export default function DashboardPage() {
           </Select>
 
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -185,7 +193,7 @@ export default function DashboardPage() {
           </Select>
         </div>
 
-        <div className="text-sm text-muted-foreground">
+        <div className="text-xs sm:text-sm text-muted-foreground">
           Showing {filteredEndpoints.length} of {endpoints.length} endpoints
         </div>
 
@@ -195,14 +203,14 @@ export default function DashboardPage() {
           </div>
         ) : filteredEndpoints.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-base sm:text-lg">
               {searchQuery || filterMethod !== "all"
                 ? "No endpoints match your filters"
                 : "No endpoints available yet"}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredEndpoints.map((endpoint, index) => (
               <EndpointCard
                 key={endpoint.id || `endpoint-${index}`}

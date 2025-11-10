@@ -125,117 +125,160 @@ export function EndpointDetailsModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl lg:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center gap-3">
-              <DialogTitle className="text-2xl">{endpoint.name}</DialogTitle>
-              <Badge className={getMethodColor(endpoint.httpMethod)}>{endpoint.httpMethod}</Badge>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              <DialogTitle className="text-xl sm:text-2xl break-words">
+                {endpoint.name}
+              </DialogTitle>
+              <Badge
+                className={`${getMethodColor(
+                  endpoint.httpMethod
+                )} text-xs w-fit`}
+              >
+                {endpoint.httpMethod}
+              </Badge>
             </div>
-            <DialogDescription>{endpoint.description}</DialogDescription>
-            {endpoint.averageRating !== undefined && endpoint.averageRating > 0 && (
-              <div className="flex items-center gap-2 pt-2">
-                <div className="flex items-center gap-1">
-                  {renderStars(endpoint.averageRating)}
+            <DialogDescription className="text-sm">
+              {endpoint.description}
+            </DialogDescription>
+            {endpoint.averageRating !== undefined &&
+              endpoint.averageRating > 0 && (
+                <div className="flex flex-wrap items-center gap-2 pt-2">
+                  <div className="flex items-center gap-1">
+                    {renderStars(endpoint.averageRating)}
+                  </div>
+                  <span className="text-xs sm:text-sm text-muted-foreground">
+                    {endpoint.averageRating.toFixed(1)} (
+                    {endpoint.totalReviews}{" "}
+                    {endpoint.totalReviews === 1 ? "review" : "reviews"})
+                  </span>
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  {endpoint.averageRating.toFixed(1)} ({endpoint.totalReviews} {endpoint.totalReviews === 1 ? 'review' : 'reviews'})
-                </span>
-              </div>
-            )}
+              )}
           </DialogHeader>
 
-        <div className="space-y-6">
-          <div className="border-t pt-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Price:</span>
-                <div className="flex items-center gap-1">
-                  <img
-                    src="/usdc.svg"
-                    alt="USDC"
-                    className="w-4 h-4"
-                    style={{ display: "inline-block", verticalAlign: "middle" }}
-                  />
-                  <span className="text-xl font-bold text-green-600 dark:text-green-500">
-                    {endpoint.paymentAmount}
+          <div className="space-y-4 sm:space-y-6">
+            <div className="border-t pt-3 sm:pt-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm text-muted-foreground">
+                    Price:
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <img
+                      src="/usdc.svg"
+                      alt="USDC"
+                      className="w-4 h-4"
+                      style={{
+                        display: "inline-block",
+                        verticalAlign: "middle",
+                      }}
+                    />
+                    <span className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-500">
+                      {endpoint.paymentAmount}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm text-muted-foreground">
+                    Provider:
+                  </span>
+                  <span className="text-base sm:text-lg font-bold truncate">
+                    @{endpoint.username || "unknown"}
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Provider:</span>
-                <span className="text-lg font-bold">@{endpoint.username || "unknown"}</span>
-              </div>
+              {!isOwnEndpoint && (
+                <div className="mt-3 sm:mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setReviewModalOpen(true)}
+                    className="w-full text-sm"
+                  >
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                    Rate this Endpoint
+                  </Button>
+                </div>
+              )}
             </div>
-            {!isOwnEndpoint && (
-              <div className="mt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setReviewModalOpen(true)}
-                  className="w-full"
+
+            <Tabs defaultValue="urls" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 h-auto">
+                <TabsTrigger value="urls" className="text-xs sm:text-sm py-2">
+                  URLs
+                </TabsTrigger>
+                <TabsTrigger
+                  value="sample-body"
+                  className="text-xs sm:text-sm py-2"
                 >
-                  <Star className="w-4 h-4 mr-2" />
-                  Rate this Endpoint
-                </Button>
-              </div>
-            )}
+                  Body
+                </TabsTrigger>
+                <TabsTrigger
+                  value="sample-response"
+                  className="text-xs sm:text-sm py-2"
+                >
+                  Response
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="urls" className="space-y-3 sm:space-y-4 mt-4">
+                <div className="space-y-2">
+                  <p className="text-xs sm:text-sm font-medium">Proxy URL</p>
+                  <div className="p-2 sm:p-3 rounded-md bg-muted/50 border">
+                    <code className="text-xs sm:text-sm break-all">
+                      {proxyUrl}
+                    </code>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Use this URL to make requests with x402 payment protection
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs sm:text-sm font-medium">
+                    MCP Server URL
+                  </p>
+                  <div className="p-2 sm:p-3 rounded-md bg-muted/50 border">
+                    <code className="text-xs sm:text-sm break-all">
+                      {mcpUrl}
+                    </code>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Add this URL to your MCP client configuration to access all
+                    endpoints via the Model Context Protocol
+                  </p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="sample-body" className="mt-4">
+                <JsonDisplay
+                  data={endpoint.sampleBody}
+                  title="Sample Request Body"
+                />
+              </TabsContent>
+
+              <TabsContent value="sample-response" className="mt-4">
+                <JsonDisplay
+                  data={endpoint.sampleResponse}
+                  title="Sample Response"
+                />
+              </TabsContent>
+            </Tabs>
           </div>
+        </DialogContent>
+      </Dialog>
 
-          <Tabs defaultValue="urls" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="urls">URLs</TabsTrigger>
-              <TabsTrigger value="sample-body">Sample Body</TabsTrigger>
-              <TabsTrigger value="sample-response">Sample Response</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="urls" className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Proxy URL</p>
-                <div className="p-3 rounded-md bg-muted/50 border">
-                  <code className="text-sm break-all">{proxyUrl}</code>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Use this URL to make requests with x402 payment protection
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium">MCP Server URL</p>
-                <div className="p-3 rounded-md bg-muted/50 border">
-                  <code className="text-sm break-all">{mcpUrl}</code>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Add this URL to your MCP client configuration to access all endpoints
-                  via the Model Context Protocol
-                </p>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="sample-body" className="mt-4">
-              <JsonDisplay data={endpoint.sampleBody} title="Sample Request Body" />
-            </TabsContent>
-
-            <TabsContent value="sample-response" className="mt-4">
-              <JsonDisplay
-                data={endpoint.sampleResponse}
-                title="Sample Response"
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </DialogContent>
-    </Dialog>
-
-    <ReviewEndpointModal
-      endpoint={endpoint}
-      open={reviewModalOpen}
-      onOpenChange={setReviewModalOpen}
-      currentUserWallet={currentUserWallet}
-      onReviewSubmitted={() => {
-        onReviewSubmitted?.();
-      }}
-    />
-  </>
+      <ReviewEndpointModal
+        endpoint={endpoint}
+        open={reviewModalOpen}
+        onOpenChange={setReviewModalOpen}
+        currentUserWallet={currentUserWallet}
+        onReviewSubmitted={() => {
+          onReviewSubmitted?.();
+        }}
+      />
+    </>
   );
 }
 
