@@ -1,8 +1,9 @@
+import { solana } from '@faremeter/info';
+import { express as faremeter } from '@faremeter/middleware';
 import { and, eq } from 'drizzle-orm';
 import { NextFunction, Request, Response } from 'express';
 import { db } from '../config/database';
 import { endpoints, users } from '../db/schema';
-
 /**
  * Creates a Faremeter middleware for a specific endpoint configuration
  * @param paymentAmount - Payment amount as a string
@@ -27,10 +28,6 @@ async function createPaywallMiddleware(
   if (+paymentAmount <= 0) {
     throw new Error(`Invalid payment amount: ${paymentAmount}.`);
   }
-
-  // Dynamic import for ESM modules
-  const { solana } = await import('@faremeter/info');
-  const { express: faremeter } = await import('@faremeter/middleware');
 
   return await faremeter.createMiddleware({
     facilitatorURL: 'https://facilitator.corbits.dev',

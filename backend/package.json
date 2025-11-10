@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "nodemon src/index.ts",
+    "start": "tsx src/index.ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "clean": "rm -rf dist node_modules",
