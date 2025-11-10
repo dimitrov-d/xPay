@@ -1,6 +1,8 @@
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import express, { NextFunction, Request, Response } from 'express';
+import * as path from 'path';
+import aiRouter from './routes/ai';
 import authRouter from './routes/auth';
 import endpointsRouter from './routes/endpoints';
 import mcpRouter from './routes/mcp';
@@ -16,6 +18,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
@@ -38,7 +41,12 @@ app.use('/reviews', reviewsRouter);
 
 app.use('/mcp', mcpRouter);
 
+app.use('/ai', aiRouter);
+
 app.use('/', proxyRouter);
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({

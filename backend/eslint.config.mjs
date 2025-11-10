@@ -56,6 +56,8 @@ export default tseslint.config(
       'sonarjs/todo-tag': 'off',
       'sonarjs/no-nested-conditional': 'off',
       'sonarjs/cognitive-complexity': 'off',
+      'sonarjs/cors': 'off',
+      'sonarjs/x-powered-by': 'off',
       '@typescript-eslint/no-unused-vars': [1, { argsIgnorePattern: '^_|^returns$|^of$|^type$' }],
       'import/extensions': 'off',
       'import/no-import-module-exports': 'off',

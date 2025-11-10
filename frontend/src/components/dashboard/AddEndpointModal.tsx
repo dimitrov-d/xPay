@@ -75,6 +75,10 @@ export function AddEndpointModal({
     sampleBody: null,
     sampleResponse: null,
   });
+  // Store raw string values for JSON fields to allow editing invalid JSON
+  const [customAuthHeadersRaw, setCustomAuthHeadersRaw] = useState<string>("");
+  const [sampleBodyRaw, setSampleBodyRaw] = useState<string>("");
+  const [sampleResponseRaw, setSampleResponseRaw] = useState<string>("");
 
   useEffect(() => {
     const user = getAuthUser();
@@ -97,26 +101,39 @@ export function AddEndpointModal({
         sampleBody: endpoint.sampleBody || null,
         sampleResponse: endpoint.sampleResponse || null,
       });
-    } else {
-      setFormData({
-        username: currentUsername,
-        name: "",
-        description: "",
-        originalUrl: "",
-        httpMethod: "GET",
-        paymentAmount: 0.001,
-        tokenType: "SOL",
-        customAuthHeaders: null,
-        sampleBody: null,
-        sampleResponse: null,
-      });
+      // Initialize raw string values
+      setCustomAuthHeadersRaw(formatJSON(endpoint.customAuthHeaders));
+      setSampleBodyRaw(formatJSON(endpoint.sampleBody));
+      setSampleResponseRaw(formatJSON(endpoint.sampleResponse));
+      return;
     }
+    setFormData({
+      username: currentUsername,
+      name: "",
+      description: "",
+      originalUrl: "",
+      httpMethod: "GET",
+      paymentAmount: 0.001,
+      tokenType: "SOL",
+      customAuthHeaders: null,
+      sampleBody: null,
+      sampleResponse: null,
+    });
+    // Reset raw string values
+    setCustomAuthHeadersRaw("");
+    setSampleBodyRaw("");
+    setSampleResponseRaw("");
   }, [endpoint, defaultUsername, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Parse raw JSON strings before submitting
+      const parsedCustomAuthHeaders = parseJSON(customAuthHeadersRaw);
+      const parsedSampleBody = parseJSON(sampleBodyRaw);
+      const parsedSampleResponse = parseJSON(sampleResponseRaw);
+
       if (endpoint) {
         const updateData: UpdateEndpointData & { id: string } = {
           id: endpoint.id,
@@ -126,13 +143,19 @@ export function AddEndpointModal({
           httpMethod: formData.httpMethod,
           paymentAmount: formData.paymentAmount,
           tokenType: formData.tokenType,
-          customAuthHeaders: formData.customAuthHeaders,
-          sampleBody: formData.sampleBody,
-          sampleResponse: formData.sampleResponse,
+          customAuthHeaders: parsedCustomAuthHeaders as Record<string, string> | null,
+          sampleBody: parsedSampleBody,
+          sampleResponse: parsedSampleResponse,
         };
         await onSubmit(updateData);
       } else {
-        await onSubmit(formData);
+        const createData: CreateEndpointData = {
+          ...formData,
+          customAuthHeaders: parsedCustomAuthHeaders as Record<string, string> | null,
+          sampleBody: parsedSampleBody,
+          sampleResponse: parsedSampleResponse,
+        };
+        await onSubmit(createData);
       }
       onOpenChange(false);
     } catch (error) {
@@ -352,13 +375,8 @@ export function AddEndpointModal({
                 id="customAuthHeaders"
                 placeholder='{"Authorization": "Bearer token"}'
                 rows={3}
-                value={formatJSON(formData.customAuthHeaders)}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    customAuthHeaders: parseJSON(e.target.value) as Record<string, string>,
-                  })
-                }
+                value={customAuthHeadersRaw}
+                onChange={(e) => setCustomAuthHeadersRaw(e.target.value)}
               />
             </div>
 
@@ -378,13 +396,8 @@ export function AddEndpointModal({
                 id="sampleBody"
                 placeholder='{"key": "value"}'
                 rows={3}
-                value={formatJSON(formData.sampleBody)}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    sampleBody: parseJSON(e.target.value),
-                  })
-                }
+                value={sampleBodyRaw}
+                onChange={(e) => setSampleBodyRaw(e.target.value)}
               />
             </div>
 
@@ -404,13 +417,8 @@ export function AddEndpointModal({
                 id="sampleResponse"
                 placeholder='{"result": "success"}'
                 rows={3}
-                value={formatJSON(formData.sampleResponse)}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    sampleResponse: parseJSON(e.target.value),
-                  })
-                }
+                value={sampleResponseRaw}
+                onChange={(e) => setSampleResponseRaw(e.target.value)}
               />
             </div>
 
