@@ -31,7 +31,12 @@ export default function MyEndpointsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingEndpoint, setEditingEndpoint] = useState<Endpoint | undefined>();
   const [username, setUsername] = useState("");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 1024;
+    }
+    return false; // Default to open on server-side
+  });
 
   useEffect(() => {
     if (!currentUser) {
@@ -47,10 +52,7 @@ export default function MyEndpointsPage() {
   // Initialize sidebar state based on screen size
   useEffect(() => {
     const handleResize = () => {
-      // On mobile (< 1024px), always start collapsed
-      if (window.innerWidth < 1024) {
-        setSidebarCollapsed(true);
-      }
+      setSidebarCollapsed(window.innerWidth < 1024);
     };
 
     handleResize();
@@ -115,9 +117,8 @@ export default function MyEndpointsPage() {
         <DashboardHeader onToggleSidebar={toggleSidebar} />
         <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
         <main
-          className={`flex-1 pt-20 pb-12 transition-all duration-300 ${
-            sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
-          }`}
+          className={`flex-1 pt-20 pb-12 transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+            }`}
         >
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="space-y-4 sm:space-y-6 py-4">
@@ -194,35 +195,35 @@ export default function MyEndpointsPage() {
               editingEndpoint
                 ? handleUpdateEndpoint
                 : async (data) => {
-                    try {
-                      await createEndpoint(data as CreateEndpointData);
-                      toast.success("Endpoint created successfully");
-                      await loadEndpoints();
-                      setShowAddModal(false);
-                    } catch (error: any) {
-                      toast.error(
-                        error.message || "Failed to create endpoint"
-                      );
-                      throw error;
-                    }
+                  try {
+                    await createEndpoint(data as CreateEndpointData);
+                    toast.success("Endpoint created successfully");
+                    await loadEndpoints();
+                    setShowAddModal(false);
+                  } catch (error: any) {
+                    toast.error(
+                      error.message || "Failed to create endpoint"
+                    );
+                    throw error;
                   }
+                }
             }
             onDelete={
               editingEndpoint
                 ? async (id) => {
-                    try {
-                      await deleteEndpoint(id);
-                      toast.success("Endpoint deleted successfully");
-                      await loadEndpoints();
-                      setShowAddModal(false);
-                      setEditingEndpoint(undefined);
-                    } catch (error: any) {
-                      toast.error(
-                        error.message || "Failed to delete endpoint"
-                      );
-                      throw error;
-                    }
+                  try {
+                    await deleteEndpoint(id);
+                    toast.success("Endpoint deleted successfully");
+                    await loadEndpoints();
+                    setShowAddModal(false);
+                    setEditingEndpoint(undefined);
+                  } catch (error: any) {
+                    toast.error(
+                      error.message || "Failed to delete endpoint"
+                    );
+                    throw error;
                   }
+                }
                 : undefined
             }
             endpoint={editingEndpoint}

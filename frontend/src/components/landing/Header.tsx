@@ -52,7 +52,7 @@ export const Header = () => {
                 <a href="#marketplace" className="text-sm font-medium hover:text-accent transition-colors">
                   Marketplace
                 </a>
-                <a href="#docs" className="text-sm font-medium hover:text-accent transition-colors">
+                <a href="https://docs.usexpay.xyz/" className="text-sm font-medium hover:text-accent transition-colors">
                   Docs
                 </a>
               </nav>

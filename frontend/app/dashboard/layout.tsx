@@ -13,8 +13,13 @@ export default function DashboardLayout({
 }) {
   const { currentUser } = useCurrentUser();
   const router = useRouter();
-  // Auto-collapse on mobile, expanded on desktop
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 1024;
+    }
+    return false;
+  });
 
   useEffect(() => {
     if (!currentUser) {
@@ -22,14 +27,9 @@ export default function DashboardLayout({
     }
   }, [currentUser, router]);
 
-  // Initialize sidebar state based on screen size
   useEffect(() => {
     const handleResize = () => {
-      // On mobile (< 1024px), always start collapsed
-      // On desktop, check localStorage or default to not collapsed
-      if (window.innerWidth < 1024) {
-        setSidebarCollapsed(true);
-      }
+      setSidebarCollapsed(window.innerWidth < 1024);
     };
 
     handleResize();
@@ -50,9 +50,8 @@ export default function DashboardLayout({
       <DashboardHeader onToggleSidebar={toggleSidebar} />
       <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
       <main
-        className={`flex-1 pt-20 pb-12 transition-all duration-300 ${
-          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
-        }`}
+        className={`flex-1 pt-20 pb-12 transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+          }`}
       >
         {children}
       </main>

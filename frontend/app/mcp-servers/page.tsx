@@ -19,7 +19,12 @@ export default function MCPServersPage() {
   const [filteredEndpoints, setFilteredEndpoints] = useState<Endpoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 1024;
+    }
+    return false; // Default to open on server-side
+  });
 
   useEffect(() => {
     if (!currentUser) {
@@ -28,13 +33,9 @@ export default function MCPServersPage() {
     }
   }, [currentUser, router]);
 
-  // Initialize sidebar state based on screen size
   useEffect(() => {
     const handleResize = () => {
-      // On mobile (< 1024px), always start collapsed
-      if (window.innerWidth < 1024) {
-        setSidebarCollapsed(true);
-      }
+      setSidebarCollapsed(window.innerWidth < 1024);
     };
 
     handleResize();
@@ -87,9 +88,8 @@ export default function MCPServersPage() {
       <DashboardHeader onToggleSidebar={toggleSidebar} />
       <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
       <main
-        className={`flex-1 pt-20 pb-12 transition-all duration-300 ${
-          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
-        }`}
+        className={`flex-1 pt-20 pb-12 transition-all duration-300 ${sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+          }`}
       >
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="space-y-6 sm:space-y-8">
