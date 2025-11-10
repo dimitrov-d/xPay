@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Endpoint, getProxyUrl } from "@/lib/api";
-import { Copy, Edit, Play, Star } from "lucide-react";
+import { Code, Copy, Edit, Play, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { TestEndpointModal } from "./TestEndpointModal";
@@ -13,6 +13,7 @@ interface EndpointCardProps {
   endpoint: Endpoint;
   onViewDetails: (endpoint: Endpoint) => void;
   showEarnings?: boolean;
+  showEditButton?: boolean;
 }
 
 const getMethodColor = (method: string) => {
@@ -32,7 +33,7 @@ const getMethodColor = (method: string) => {
   }
 };
 
-export function EndpointCard({ endpoint, onViewDetails, showEarnings = false }: EndpointCardProps) {
+export function EndpointCard({ endpoint, onViewDetails, showEarnings = false, showEditButton = true }: EndpointCardProps) {
   const proxyUrl = endpoint.username
     ? getProxyUrl(endpoint.username, endpoint.name)
     : "Username not available";
@@ -178,14 +179,25 @@ export function EndpointCard({ endpoint, onViewDetails, showEarnings = false }: 
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              className="flex-1 text-sm"
-              onClick={() => onViewDetails(endpoint)}
-            >
-              <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-              Edit
-            </Button>
+            {showEditButton ? (
+              <Button
+                variant="outline"
+                className="flex-1 text-sm"
+                onClick={() => onViewDetails(endpoint)}
+              >
+                <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                Edit
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="flex-1 text-sm"
+                onClick={() => onViewDetails(endpoint)}
+              >
+                <Code className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                View Details
+              </Button>
+            )}
             <Button
               variant="hero"
               className="flex-1 text-sm"

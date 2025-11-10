@@ -216,6 +216,7 @@ export default function DashboardPage() {
                 key={endpoint.id || `endpoint-${index}`}
                 endpoint={endpoint}
                 onViewDetails={handleViewDetails}
+                showEditButton={false}
               />
             ))}
           </div>
