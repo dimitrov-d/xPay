@@ -187,7 +187,7 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
           const paymentOption = x402Data.accepts.find((a) => a.network === "solana-mainnet-beta") || x402Data.accepts[0];
           setPaymentDetails(paymentOption);
         }
-        throw new Error("Payment required but FareMeter handler did not process it");
+        throw new Error("Payment required but Faremeter handler did not process it");
       }
 
       if (!response.ok) {

@@ -38,7 +38,7 @@ export const Header = () => {
               className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <Image src="/logo.png" alt="xPay" width={72} height={72} className="w-20 h-20" />
-              <span className="text-2xl font-bold">xPAY</span>
+              <span className="text-2xl font-bold">xPay</span>
             </Link>
 
             {isHomePage && (

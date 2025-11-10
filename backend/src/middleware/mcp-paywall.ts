@@ -6,7 +6,7 @@ import { db } from '../config/database';
 import { endpoints, users } from '../db/schema';
 
 /**
- * Creates a FareMeter middleware for MCP server endpoints
+ * Creates a Faremeter middleware for MCP server endpoints
  * @param paymentAmount - Payment amount as a string
  * @param asset - SPL token address (Solana public key)
  * @param userWallet - User wallet address to receive payments

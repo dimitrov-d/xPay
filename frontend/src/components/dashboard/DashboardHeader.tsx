@@ -77,7 +77,7 @@ export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
                 height={72}
                 className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20"
               />
-              <span className="text-lg sm:text-xl md:text-2xl font-bold">xPAY</span>
+              <span className="text-lg sm:text-xl md:text-2xl font-bold">xPay</span>
             </Link>
           </div>
 
