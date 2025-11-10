@@ -1,5 +1,3 @@
-import { solana } from '@faremeter/info';
-import { express as faremeter } from '@faremeter/middleware';
 import { and, eq } from 'drizzle-orm';
 import { NextFunction, Request, Response } from 'express';
 import { db } from '../config/database';
@@ -25,6 +23,10 @@ async function createMcpPaywallMiddleware(
   if (isNaN(amount) || amount <= 0) {
     throw new Error(`Invalid payment amount: ${paymentAmount}. Amount must be a positive number.`);
   }
+
+  // Dynamic import for ESM modules
+  const { solana } = await import('@faremeter/info');
+  const { express: faremeter } = await import('@faremeter/middleware');
 
   return await faremeter.createMiddleware({
     facilitatorURL: 'https://facilitator.corbits.dev',

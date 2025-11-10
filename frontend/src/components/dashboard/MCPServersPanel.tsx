@@ -56,13 +56,11 @@ export function MCPServersPanel({ endpoints }: MCPServersPanelProps) {
       ) : (
         <Accordion type="single" collapsible className="space-y-4">
           {mcpServers.map((server) => (
-            // @ts-expect-error - AccordionItem is not typed
             <AccordionItem
               key={server.username}
               value={server.username}
               className="border rounded-lg bg-card shadow-elegant"
             >
-              {/* @ts-expect-error - AccordionTrigger is not typed */}
               <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:no-underline hover:bg-muted/50 transition-colors rounded-t-lg">
                 <div className="flex flex-col gap-2 sm:gap-3 w-full pr-2 sm:pr-4">
                   <div className="flex items-center justify-between w-full gap-2">
@@ -112,7 +110,6 @@ export function MCPServersPanel({ endpoints }: MCPServersPanelProps) {
                   </div>
                 </div>
               </AccordionTrigger>
-              {/* @ts-expect-error - AccordionContent is not typed */}
               <AccordionContent className="px-4 sm:px-6 pb-4 sm:pb-6 pt-2">
                 <div className="space-y-3 sm:space-y-4">
                   {/* Available Tools */}
