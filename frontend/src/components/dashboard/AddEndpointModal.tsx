@@ -49,7 +49,7 @@ interface AddEndpointModalProps {
 }
 
 const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"];
-const TOKEN_TYPES = ["SOL", "USDC", "USDT", "CASH"];
+const TOKEN_TYPES = ["USDC", "USDT", "SOL", "CASH"];
 
 export function AddEndpointModal({
   open,
