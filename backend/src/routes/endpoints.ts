@@ -117,21 +117,6 @@ router.post(
         });
       }
 
-      await db
-        .insert(users)
-        .values({
-          walletAddress,
-          username: data.username,
-          updatedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: users.walletAddress,
-          set: {
-            username: data.username,
-            updatedAt: new Date(),
-          },
-        });
-
       const existingEndpoint = await db
         .select()
         .from(endpoints)
