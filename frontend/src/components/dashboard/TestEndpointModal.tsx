@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Endpoint, getProxyUrl } from "@/lib/api";
+import { Endpoint, getCurrentUser, getProxyUrl } from "@/lib/api";
 import { useSignSolanaTransaction, useSolanaAddress } from "@coinbase/cdp-hooks";
 import { wrap as wrapFetch } from "@faremeter/fetch";
 import { lookupKnownSPLToken } from "@faremeter/info/solana";
@@ -84,6 +84,15 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
     if (!solanaAddress) {
       toast.error("No wallet connected", {
         description: "Please connect your Coinbase wallet first",
+      });
+      return;
+    }
+
+    const user = await getCurrentUser().catch(() => null);
+
+    if (!user?.balances?.usdc) {
+      toast.error("Insufficient USDC balance", {
+        description: "You need a non-zero USDC balance to test this endpoint.",
       });
       return;
     }

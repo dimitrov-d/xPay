@@ -34,10 +34,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { CreateEndpointData, Endpoint, UpdateEndpointData } from "@/lib/api";
+import { CreateEndpointData, Endpoint, UpdateEndpointData, getCurrentUser } from "@/lib/api";
 import { getAuthUser } from "@/lib/auth";
 import { Info, Loader2, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface AddEndpointModalProps {
   open: boolean;
@@ -127,6 +128,18 @@ export function AddEndpointModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!endpoint) {
+      const user = await getCurrentUser().catch(() => null);
+
+      if (!user?.balances?.sol) {
+        toast.error("Insufficient SOL balance", {
+          description: "You need a non-zero SOL balance to add an endpoint.",
+        });
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       // Parse raw JSON strings before submitting
