@@ -30,7 +30,10 @@ async function createMcpServerForUser(
       sessions.set(sessionId, { transport, server, username });
     },
     enableDnsRebindingProtection: true,
-    allowedHosts: ['127.0.0.1', 'localhost', 'localhost:3000'],
+    allowedHosts: [
+      'localhost:3000',
+      ...(process.env.BASE_URL ? [new URL(process.env.BASE_URL).host] : []),
+    ],
   });
 
   transport.onclose = () => {
