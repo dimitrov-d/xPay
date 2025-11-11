@@ -58,7 +58,7 @@ export const Hero = () => {
                 Get Started Now
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" onClick={() => window.open("https://docs.usexpay.xyz/", "_blank")}>
                 View Documentation
               </Button>
             </div>

@@ -16,7 +16,7 @@ A modern Next.js 15 app that delivers xPay’s landing experience, marketplace, 
 - Framework: Next.js 15 (App Router)
 - Styling/UI: Tailwind CSS, Radix UI, custom components, Lucide icons
 - State/Data: React Query
-- Auth/Wallet: `@coinbase/cdp-react` and `@coinbase/cdp-hooks`
+- Auth/Wallet: Coinbase Embedded Wallets (CDP React SDK)
 - Notifications: `sonner`
 - Typescript throughout
 

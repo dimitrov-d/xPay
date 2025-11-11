@@ -34,7 +34,7 @@ export const Footer = () => (
               </a>
             </li>
             <li>
-              <a href="https://docs.usexpay.xyz/" className="hover:text-foreground transition-colors">
+              <a href="https://docs.usexpay.xyz/" className="hover:text-foreground transition-colors" target="_blank">
                 Documentation
               </a>
             </li>
@@ -47,10 +47,10 @@ export const Footer = () => (
           © 2025 xPay. Built for the Solana x402 Protocol Hackathon.
         </p>
         <div className="flex items-center gap-4">
-          <a href="#github" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="https://github.com/dimitrov-d/xpay" className="text-muted-foreground hover:text-foreground transition-colors" target="_blank">
             <Github className="w-5 h-5" />
           </a>
-          <a href="#docs" className="text-muted-foreground hover:text-foreground transition-colors">
+          <a href="https://docs.usexpay.xyz/" className="text-muted-foreground hover:text-foreground transition-colors" target="_blank">
             <FileText className="w-5 h-5" />
           </a>
         </div>
