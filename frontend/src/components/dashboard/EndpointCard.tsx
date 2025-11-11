@@ -105,7 +105,7 @@ export function EndpointCard({ endpoint, onViewDetails, showEarnings = false, sh
         <CardContent className="space-y-3 sm:space-y-4 flex-1 flex flex-col">
           <div className="space-y-2 flex-1">
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Proxy URL:</p>
+              {/* <p className="text-xs text-muted-foreground">Proxy URL:</p> */}
               <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 border">
                 <code className="flex-1 text-xs break-all overflow-hidden">
                   {proxyUrl}
