@@ -4,6 +4,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import * as path from 'path';
 import aiRouter from './routes/ai';
 import authRouter from './routes/auth';
+import defiRouter from './routes/defi';
 import endpointsRouter from './routes/endpoints';
 import mcpRouter from './routes/mcp';
 import proxyRouter from './routes/proxy';
@@ -42,6 +43,8 @@ app.use('/reviews', reviewsRouter);
 app.use('/mcp', mcpRouter);
 
 app.use('/ai', aiRouter);
+
+app.use('/defi', defiRouter);
 
 app.use('/', proxyRouter);
 
