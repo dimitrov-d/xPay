@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     url: "https://usexpay.xyz",
     images: [
       {
-        url: "http://usexpay.xyz/banner.png",
+        url: "https://usexpay.xyz/banner.png",
         width: 1200,
         height: 630,
         alt: "xPay banner",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@xPay",
     creator: "@xPay",
-    images: ["http://usexpay.xyz/banner.png"],
+    images: ["https://usexpay.xyz/banner.png"],
     title: "xPay – Instantly Monetize Any API, AI Agent, or MCP Server",
     description: "xPay enables API, AI, and MCP monetization with instant x402 paywalls.",
   },
