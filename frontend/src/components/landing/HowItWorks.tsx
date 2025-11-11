@@ -9,7 +9,7 @@ const steps = [
   {
     number: "02",
     title: "Get Your xPay Wrapper",
-    description: "Instantly receive a new endpoint like api.marketplace.com/yourapi that enforces x402 payment verification automatically.",
+    description: "Instantly receive a new endpoint like api.usexpay.xyz/yourapi that enforces x402 payment verification automatically.",
   },
   {
     number: "03",

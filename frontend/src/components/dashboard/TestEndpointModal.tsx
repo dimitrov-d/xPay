@@ -16,6 +16,7 @@ import { wrap as wrapFetch } from "@faremeter/fetch";
 import { lookupKnownSPLToken } from "@faremeter/info/solana";
 import { createPaymentHandler } from "@faremeter/payment-solana/exact";
 import {
+  clusterApiUrl,
   Connection,
   PublicKey,
   VersionedTransaction
@@ -109,7 +110,7 @@ export function TestEndpointModal({ endpoint, open, onOpenChange }: TestEndpoint
       setStep("signing");
 
       const network = "mainnet-beta";
-      const connection = new Connection("https://api.mainnet-beta.solana.com", "confirmed");
+      const connection = new Connection(clusterApiUrl(network), "confirmed");
 
       const usdcMint = new PublicKey(lookupKnownSPLToken(network, "USDC")!.address);
       const payerPublicKey = new PublicKey(solanaAddress);

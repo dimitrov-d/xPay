@@ -1,7 +1,14 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { isAuthenticated } from "@/lib/auth";
+import { useCurrentUser } from "@coinbase/cdp-hooks";
+import { SignInModal, SignInModalContent } from "@coinbase/cdp-react";
 import { ExternalLink, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const mockAPIs = [
   {
@@ -28,66 +35,98 @@ const mockAPIs = [
 ];
 
 export const Marketplace = () => {
+  const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const router = useRouter();
+  const { currentUser } = useCurrentUser();
+
+  const handleSignInSuccess = () => {
+    setIsSignInOpen(false);
+  };
+
+  const handleGetStartedClick = () => {
+    if (currentUser && isAuthenticated()) {
+      router.push("/dashboard");
+    } else {
+      setIsSignInOpen(true);
+    }
+  };
+
   return (
-    <section className="py-24 px-4 bg-card">
-      <div className="container mx-auto max-w-6xl">
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold">
-            The Agent Discovery Layer
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            A marketplace where AI agents find, evaluate, and consume services - all powered by x402
-          </p>
-        </div>
+    <>
+      <section className="py-24 px-4 bg-card">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold">
+              The Agent Discovery Layer
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              A marketplace where AI agents find, evaluate, and consume services - all powered by x402
+            </p>
+          </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {mockAPIs.map((api, index) => (
-            <Card key={index} className="border-border hover:shadow-elegant transition-all duration-300">
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-semibold text-lg">{api.name}</h3>
-                    <Badge variant="secondary" className="text-xs">
-                      {api.category}
-                    </Badge>
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            {mockAPIs.map((api, index) => (
+              <Card key={index} className="border-border hover:shadow-elegant transition-all duration-300">
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <h3 className="font-semibold text-lg">{api.name}</h3>
+                      <Badge variant="secondary" className="text-xs">
+                        {api.category}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm">
+                      <Star className="w-4 h-4 fill-accent text-accent" />
+                      <span className="font-medium">{api.rating}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-sm">
-                    <Star className="w-4 h-4 fill-accent text-accent" />
-                    <span className="font-medium">{api.rating}</span>
-                  </div>
-                </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-border">
-                  <div>
-                    <div className="text-2xl font-bold text-accent">{api.price}</div>
-                    <div className="text-xs text-muted-foreground">per call</div>
+                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                    <div>
+                      <div className="text-2xl font-bold text-accent">{api.price}</div>
+                      <div className="text-xs text-muted-foreground">per call</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold">{api.calls}</div>
+                      <div className="text-xs text-muted-foreground">total calls</div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold">{api.calls}</div>
-                    <div className="text-xs text-muted-foreground">total calls</div>
-                  </div>
-                </div>
 
-                <Button variant="outline" className="w-full" size="sm">
-                  <ExternalLink className="w-4 h-4" />
-                  View Details
-                </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    size="sm"
+                    onClick={handleGetStartedClick}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Details
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Card className="border-border bg-muted/30 inline-block">
+              <CardContent className="p-6 space-y-2">
+                <p className="font-semibold text-lg">MCP-Native Discovery</p>
+                <p className="text-muted-foreground max-w-lg">
+                  Every listed API is automatically exposed as an MCP server, enabling seamless agent-to-agent communication and discovery.
+                </p>
               </CardContent>
             </Card>
-          ))}
+          </div>
         </div>
-
-        <div className="text-center">
-          <Card className="border-border bg-muted/30 inline-block">
-            <CardContent className="p-6 space-y-2">
-              <p className="font-semibold text-lg">MCP-Native Discovery</p>
-              <p className="text-muted-foreground max-w-lg">
-                Every listed API is automatically exposed as an MCP server, enabling seamless agent-to-agent communication and discovery.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </section>
+      </section>
+      {isSignInOpen && (
+        <SignInModal
+          open={isSignInOpen}
+          setIsOpen={setIsSignInOpen}
+          onSuccess={handleSignInSuccess}
+        >
+          <SignInModalContent />
+        </SignInModal>
+      )}
+    </>
   );
 };

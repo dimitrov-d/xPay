@@ -11,7 +11,7 @@ Monetize your endpoints without writing code. xPay is the first no-code platform
 ---
 
 ## What you can do with xPay
-- **Wrap any HTTP endpoint** in a paid proxy: `https://api.yourxpay.com/:username/:endpointName`
+- **Wrap any HTTP endpoint** in a paid proxy: `https://api.usexpay.xyz/:username/:endpointName`
 - **Set per-call pricing and token** (USDC SPL by default; any SPL token address supported)
 - **Enforce payment** via the x402 standard with Faremeter middleware
 - **List your API in a marketplace** with ratings, usage examples, and earnings
