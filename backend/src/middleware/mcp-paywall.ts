@@ -26,8 +26,6 @@ async function createMcpPaywallMiddleware(
     throw new Error(`Invalid payment amount: ${paymentAmount}. Amount must be a positive number.`);
   }
 
-  // Dynamic import for ESM modules
-
   return await faremeter.createMiddleware({
     facilitatorURL: 'https://facilitator.corbits.dev',
     accepts: solana

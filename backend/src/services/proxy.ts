@@ -31,6 +31,8 @@ export async function forwardRequest(req: Request, config: ProxyConfig): Promise
 
   if (customAuthHeaders) Object.assign(headers, customAuthHeaders);
 
+  delete headers['accept-encoding'];
+
   const axiosConfig: AxiosRequestConfig = {
     method: httpMethod,
     url: url.toString(),
@@ -38,6 +40,7 @@ export async function forwardRequest(req: Request, config: ProxyConfig): Promise
     data: req.body,
     validateStatus: () => true, // Don't throw on any status code
     timeout: 30_000,
+    decompress: true,
   };
 
   try {

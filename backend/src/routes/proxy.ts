@@ -48,6 +48,14 @@ router.all('/:username/:endpointName', paywallMiddleware, async (req: Request, r
         customAuthHeaders: endpoint.customAuthHeaders as Record<string, string> | null,
       });
 
+      let responseData = response.data;
+      if (Buffer.isBuffer(responseData)) {
+        responseData = responseData.toString('utf-8');
+        try {
+          responseData = JSON.parse(responseData);
+        } catch {} // Not JSON, keep as string
+      }
+
       // Track earnings for successful responses (2xx status codes)
       if (response.status >= 200 && response.status < 300) {
         try {
@@ -74,15 +82,21 @@ router.all('/:username/:endpointName', paywallMiddleware, async (req: Request, r
 
       res.status(response.status);
 
-      const headersToExclude = ['content-encoding', 'transfer-encoding', 'connection'];
+      const headersToExclude = [
+        'content-encoding',
+        'transfer-encoding',
+        'connection',
+        'content-length',
+      ];
       Object.keys(response.headers).forEach((key) => {
         if (!headersToExclude.includes(key.toLowerCase())) {
           res.setHeader(key, response.headers[key] as string);
         }
       });
 
-      return res.send(response.data);
+      return res.send(responseData);
     } catch (error: any) {
+      console.error('Error in proxy route:', error);
       const status = error.status || 502;
       const message = error.message || 'Proxy error';
       const data = error.data || { error: 'Failed to forward request' };
