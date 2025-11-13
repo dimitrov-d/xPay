@@ -69,14 +69,18 @@ router.all('/:username/:endpointName', paywallMiddleware, async (req: Request, r
             const currentEarnings = parseFloat(fullEndpoint.totalEarnings || '0');
             const paymentAmount = parseFloat(fullEndpoint.paymentAmount || '0');
             const newEarnings = (currentEarnings + paymentAmount).toString();
+            const currentCalls = fullEndpoint.totalCalls || 0;
 
             await db
               .update(endpoints)
-              .set({ totalEarnings: newEarnings })
+              .set({
+                totalEarnings: newEarnings,
+                totalCalls: currentCalls + 1,
+              })
               .where(eq(endpoints.id, endpoint.id));
           }
-        } catch (earningsError) {
-          console.error('Error updating earnings:', earningsError);
+        } catch (trackingError) {
+          console.error('Error updating earnings and calls:', trackingError);
         }
       }
 

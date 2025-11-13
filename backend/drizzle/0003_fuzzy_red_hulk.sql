@@ -1,0 +1,1 @@
+ALTER TABLE "endpoints" ADD COLUMN "total_calls" integer DEFAULT 0 NOT NULL;

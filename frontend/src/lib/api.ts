@@ -24,6 +24,7 @@ export interface Endpoint {
   sampleBody?: any;
   sampleResponse?: any;
   totalEarnings?: string;
+  totalCalls?: number;
   averageRating?: number;
   totalReviews?: number;
   createdAt: string;

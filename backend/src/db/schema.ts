@@ -31,6 +31,7 @@ export const endpoints = pgTable('endpoints', {
   sampleBody: jsonb('sample_body'),
   sampleResponse: jsonb('sample_response'),
   totalEarnings: numeric('total_earnings').default('0').notNull(),
+  totalCalls: integer('total_calls').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

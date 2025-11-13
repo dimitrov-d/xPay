@@ -154,25 +154,39 @@ export function EndpointCard({ endpoint, onViewDetails, showEarnings = false, sh
                   </span>
                 </div>
               </div>
-              {showEarnings && endpoint.totalEarnings !== undefined && (
-                <div className="flex items-center gap-2 mt-3 pt-3 border-t">
-                  <span className="text-xs text-muted-foreground">
-                    Total Earnings:
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <img
-                      src="/usdc.svg"
-                      alt="USDC"
-                      className="w-4 h-4 sm:w-5 sm:h-5"
-                      style={{
-                        display: "inline-block",
-                        verticalAlign: "middle",
-                      }}
-                    />
-                    <span className="font-bold text-lg sm:text-xl text-green-600 dark:text-green-500">
-                      {parseFloat(endpoint.totalEarnings).toFixed(4)}
-                    </span>
-                  </div>
+              {showEarnings && (
+                <div className="mt-3 pt-3 border-t space-y-2">
+                  {endpoint.totalEarnings !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        Total Earnings:
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <img
+                          src="/usdc.svg"
+                          alt="USDC"
+                          className="w-4 h-4 sm:w-5 sm:h-5"
+                          style={{
+                            display: "inline-block",
+                            verticalAlign: "middle",
+                          }}
+                        />
+                        <span className="font-bold text-lg sm:text-xl text-green-600 dark:text-green-500">
+                          {parseFloat(endpoint.totalEarnings).toFixed(4)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {endpoint.totalCalls !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        Total Calls:
+                      </span>
+                      <span className="font-bold text-lg sm:text-xl text-blue-600 dark:text-blue-500">
+                        {endpoint.totalCalls.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
