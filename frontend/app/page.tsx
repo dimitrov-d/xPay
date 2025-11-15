@@ -16,7 +16,18 @@ export default function Home() {
   return (
     <>
       {SignatureModal}
-      <div className="min-h-screen">
+      <div className="bg-green-600 text-white py-2 px-4 text-center text-sm fixed top-0 left-0 right-0 z-[60]">
+        <span>xPay is now live on x402scan! Check it out here: </span>
+        <a
+          href="https://x402scan.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline font-semibold hover:text-green-100 transition-colors"
+        >
+          x402scan.com
+        </a>
+      </div>
+      <div className="min-h-screen pt-[104px]">
         <Header />
         <main>
           <Hero />
