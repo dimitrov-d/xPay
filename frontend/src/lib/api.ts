@@ -373,3 +373,44 @@ export const reviewsApi = {
     return response.json();
   },
 };
+
+export interface AnalyticsSummary {
+  totalRequests: number;
+  successfulRequests: number;
+  erroredRequests: number;
+  successRate: number;
+  averageResponseTime: number;
+}
+
+export interface AnalyticsTimeSeries {
+  timestamp: string;
+  successful: number;
+  errored: number;
+}
+
+export interface AnalyticsData {
+  endpointId: string;
+  period: '24h' | '7d' | '30d' | '90d' | 'all';
+  summary: AnalyticsSummary;
+  timeSeries: AnalyticsTimeSeries[];
+}
+
+export const analyticsApi = {
+  async getEndpointAnalytics(
+    endpointId: string,
+    period: '24h' | '7d' | '30d' | '90d' | 'all' = '7d',
+  ): Promise<AnalyticsData> {
+    const headers = getAuthHeaders();
+    const response = await fetch(
+      `${API_BASE_URL}/analytics/endpoint/${endpointId}?period=${period}`,
+      {
+        headers,
+      },
+    );
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch analytics');
+    }
+    return response.json();
+  },
+};

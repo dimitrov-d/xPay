@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   jsonb,
   numeric,
@@ -52,9 +53,22 @@ export const reviews = pgTable(
   (table) => [unique().on(table.endpointId, table.userWallet)],
 );
 
+export const requestLogs = pgTable('request_logs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  endpointId: uuid('endpoint_id')
+    .notNull()
+    .references(() => endpoints.id, { onDelete: 'cascade' }),
+  statusCode: integer('status_code').notNull(),
+  isSuccess: boolean('is_success').notNull().default(false),
+  responseTime: integer('response_time'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Endpoint = typeof endpoints.$inferSelect;
 export type NewEndpoint = typeof endpoints.$inferInsert;
 export type Review = typeof reviews.$inferSelect;
 export type NewReview = typeof reviews.$inferInsert;
+export type RequestLog = typeof requestLogs.$inferSelect;
+export type NewRequestLog = typeof requestLogs.$inferInsert;

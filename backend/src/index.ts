@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import express, { NextFunction, Request, Response } from 'express';
 import * as path from 'path';
 import aiRouter from './routes/ai';
+import analyticsRouter from './routes/analytics';
 import authRouter from './routes/auth';
 import defiRouter from './routes/defi';
 import endpointsRouter from './routes/endpoints';
@@ -39,6 +40,8 @@ app.use('/endpoints', endpointsRouter);
 app.use('/user', userRouter);
 
 app.use('/reviews', reviewsRouter);
+
+app.use('/analytics', analyticsRouter);
 
 app.use('/mcp', mcpRouter);
 

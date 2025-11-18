@@ -16,6 +16,7 @@ import { Star } from "lucide-react";
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { EndpointAnalytics } from "./EndpointAnalytics";
 import { ReviewEndpointModal } from "./ReviewEndpointModal";
 
 interface EndpointDetailsModalProps {
@@ -204,7 +205,7 @@ export function EndpointDetailsModal({
             </div>
 
             <Tabs defaultValue="urls" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 h-auto">
+              <TabsList className={`grid w-full h-auto ${isOwnEndpoint ? 'grid-cols-4' : 'grid-cols-3'}`}>
                 <TabsTrigger value="urls" className="text-xs sm:text-sm py-2">
                   URLs
                 </TabsTrigger>
@@ -220,6 +221,14 @@ export function EndpointDetailsModal({
                 >
                   Response
                 </TabsTrigger>
+                {isOwnEndpoint && (
+                  <TabsTrigger
+                    value="analytics"
+                    className="text-xs sm:text-sm py-2"
+                  >
+                    Analytics
+                  </TabsTrigger>
+                )}
               </TabsList>
 
               <TabsContent value="urls" className="space-y-3 sm:space-y-4 mt-4">
@@ -264,6 +273,12 @@ export function EndpointDetailsModal({
                   title="Sample Response"
                 />
               </TabsContent>
+
+              {isOwnEndpoint && (
+                <TabsContent value="analytics" className="mt-4">
+                  <EndpointAnalytics endpointId={endpoint.id} />
+                </TabsContent>
+              )}
             </Tabs>
           </div>
         </DialogContent>

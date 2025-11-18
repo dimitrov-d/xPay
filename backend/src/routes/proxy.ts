@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { Request, Response, Router } from 'express';
 import { db } from '../config/database';
-import { endpoints, users } from '../db/schema';
+import { endpoints, requestLogs, users } from '../db/schema';
 import { paywallMiddleware } from '../middleware/paywall';
 import { forwardRequest } from '../services/proxy';
 
@@ -41,12 +41,21 @@ router.all('/:username/:endpointName', paywallMiddleware, async (req: Request, r
       });
     }
 
+    const startTime = Date.now();
+    let responseTime: number | null = null;
+    let statusCode = 500;
+    let isSuccess = false;
+
     try {
       const response = await forwardRequest(req, {
         originalUrl: endpoint.originalUrl,
         httpMethod: endpoint.httpMethod,
         customAuthHeaders: endpoint.customAuthHeaders as Record<string, string> | null,
       });
+
+      responseTime = Date.now() - startTime;
+      statusCode = response.status;
+      isSuccess = response.status >= 200 && response.status < 300;
 
       let responseData = response.data;
       if (Buffer.isBuffer(responseData)) {
@@ -57,7 +66,7 @@ router.all('/:username/:endpointName', paywallMiddleware, async (req: Request, r
       }
 
       // Track earnings for successful responses (2xx status codes)
-      if (response.status >= 200 && response.status < 300) {
+      if (isSuccess) {
         try {
           const [fullEndpoint] = await db
             .select()
@@ -84,6 +93,18 @@ router.all('/:username/:endpointName', paywallMiddleware, async (req: Request, r
         }
       }
 
+      // Log the request (async, don't block response)
+      db.insert(requestLogs)
+        .values({
+          endpointId: endpoint.id,
+          statusCode,
+          isSuccess,
+          responseTime,
+        })
+        .catch((logError) => {
+          console.error('Error logging request:', logError);
+        });
+
       res.status(response.status);
 
       const headersToExclude = [
@@ -100,12 +121,25 @@ router.all('/:username/:endpointName', paywallMiddleware, async (req: Request, r
 
       return res.send(responseData);
     } catch (error: any) {
+      responseTime = Date.now() - startTime;
+      statusCode = error.status || 502;
+
+      db.insert(requestLogs)
+        .values({
+          endpointId: endpoint.id,
+          statusCode,
+          isSuccess: false,
+          responseTime,
+        })
+        .catch((logError) => {
+          console.error('Error logging request:', logError);
+        });
+
       console.error('Error in proxy route:', error);
-      const status = error.status || 502;
       const message = error.message || 'Proxy error';
       const data = error.data || { error: 'Failed to forward request' };
 
-      return res.status(status).json({
+      return res.status(statusCode).json({
         error: message,
         ...data,
       });
