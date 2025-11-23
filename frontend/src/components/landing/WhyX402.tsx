@@ -22,20 +22,20 @@ const benefits = [
 
 export const WhyX402 = () => {
   return (
-    <section className="py-24 px-4 bg-gradient-primary text-primary-foreground">
+    <section className="py-24 px-4 bg-gradient-primary text-white">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center space-y-4 mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold">
+          <h2 className="text-4xl md:text-5xl font-bold text-white">
             Why x402 Changes Everything
           </h2>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto">
+          <p className="text-xl opacity-90 max-w-2xl mx-auto text-white">
             The protocol designed for the autonomous economy
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           {benefits.map((benefit, index) => (
-            <Card key={index} className="bg-primary-foreground/5 border-primary-foreground/10 backdrop-blur-sm">
+            <Card key={index} className="bg-white/5 border-white/10 backdrop-blur-sm">
               <CardContent className="p-6 space-y-3">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-6 h-6 text-accent shrink-0 mt-1" />
@@ -52,7 +52,7 @@ export const WhyX402 = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <Card className="bg-primary-foreground/10 border-primary-foreground/20 backdrop-blur-sm inline-block">
+          <Card className="bg-white/10 border-white/20 backdrop-blur-sm inline-block">
             <CardContent className="p-8">
               <p className="text-2xl font-semibold mb-2 text-white">
                 The Stripe Moment for API Payments

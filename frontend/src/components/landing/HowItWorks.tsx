@@ -37,7 +37,7 @@ export const HowItWorks = () => {
           {steps.map((step, index) => (
             <Card key={index} className="relative border-border bg-card hover:shadow-elegant transition-all duration-300">
               <CardContent className="p-8 space-y-4">
-                <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto md:mx-0 shadow-elegant">
+                <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold mx-auto md:mx-0 shadow-elegant dark:bg-secondary dark:text-secondary-foreground">
                   {step.number}
                 </div>
                 <h3 className="text-2xl font-semibold">{step.title}</h3>

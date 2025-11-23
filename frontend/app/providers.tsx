@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CDPReactProvider } from "@coinbase/cdp-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -29,25 +30,27 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <CDPReactProvider
-      config={{
-        projectId: projectId || "",
-        appName: "xPay",
-        appLogoUrl: "/logo.png",
-        solana: {
-          createOnLogin: true,
-        },
-      }}
-    >
-      <QueryClientProvider client={queryClient}>
-        {/* @ts-expect-error - React 18/19 type compatibility issue */}
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          {children}
-        </TooltipProvider>
-      </QueryClientProvider>
-    </CDPReactProvider>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <CDPReactProvider
+        config={{
+          projectId: projectId || "",
+          appName: "xPay",
+          appLogoUrl: "/logo.png",
+          solana: {
+            createOnLogin: true,
+          },
+        }}
+      >
+        <QueryClientProvider client={queryClient}>
+          {/* @ts-expect-error - React 18/19 type compatibility issue */}
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            {children}
+          </TooltipProvider>
+        </QueryClientProvider>
+      </CDPReactProvider>
+    </ThemeProvider>
   );
 }
 

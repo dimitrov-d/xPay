@@ -29,11 +29,11 @@ export const CTA = () => {
     <>
       <section className="py-24 px-4">
         <div className="container mx-auto max-w-4xl">
-          <div className="text-center space-y-8 bg-gradient-primary rounded-2xl p-12 md:p-16 shadow-bold">
-            <h2 className="text-4xl md:text-5xl font-bold text-primary-foreground">
+          <div className="text-center space-y-8 bg-gradient-primary rounded-2xl p-12 md:p-16 shadow-bold text-white">
+            <h2 className="text-4xl md:text-5xl font-bold text-white">
               Ready to Monetize Without Code?
             </h2>
-            <p className="text-xl text-primary-foreground/90 max-w-2xl mx-auto">
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
               Turn your APIs, agents, and infrastructure into revenue streams today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">

@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { authApi } from "@/lib/api";
 import { useCurrentUser, useSignOut } from "@coinbase/cdp-hooks";
 import { List, LogOut, Menu, User, Wallet } from "lucide-react";
@@ -75,7 +76,7 @@ export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
                 alt="xPay"
                 width={72}
                 height={72}
-                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20"
+                className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 dark:invert transition-all duration-300"
               />
               <span className="text-lg sm:text-xl md:text-2xl font-bold">xPay</span>
             </Link>
@@ -83,6 +84,7 @@ export const DashboardHeader = ({ onToggleSidebar }: DashboardHeaderProps) => {
 
           {currentUser && (
             <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
+              <ThemeToggle />
               <div className="h-6 sm:h-8 w-px bg-border hidden sm:block" />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

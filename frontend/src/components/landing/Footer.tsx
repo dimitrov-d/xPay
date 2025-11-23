@@ -7,7 +7,7 @@ export const Footer = () => (
       <div className="flex flex-col md:flex-row items-start md:items-start justify-center gap-1 md:gap-12 mb-8">
         <div className="flex flex-col gap-3 max-w-md w-full md:w-2/5 md:items-end">
           <div className="flex items-center gap-2 shrink-0 mb-2">
-            <Image src="/logo.png" alt="xPay" width={72} height={72} className="w-20 h-20" />
+            <Image src="/logo.png" alt="xPay" width={72} height={72} className="w-20 h-20 dark:invert transition-all duration-300" />
             <span className="text-xl font-bold">xPay</span>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed md:text-right">

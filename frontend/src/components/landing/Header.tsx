@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { isAuthenticated } from "@/lib/auth";
 import { useCurrentUser } from "@coinbase/cdp-hooks";
 import { SignInModal, SignInModalContent } from "@coinbase/cdp-react";
@@ -37,7 +38,7 @@ export const Header = () => {
               href={currentUser ? "/dashboard" : "/"}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
             >
-              <Image src="/logo.png" alt="xPay" width={72} height={72} className="w-20 h-20" />
+              <Image src="/logo.png" alt="xPay" width={72} height={72} className="w-20 h-20 dark:invert transition-all duration-300" />
               <span className="text-2xl font-bold">xPay</span>
             </Link>
 
@@ -58,8 +59,9 @@ export const Header = () => {
               </nav>
             )}
 
-            {isHomePage && (
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              {isHomePage && (
                 <Button
                   variant="hero"
                   size="sm"
@@ -67,8 +69,8 @@ export const Header = () => {
                 >
                   Get Started
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </header>
